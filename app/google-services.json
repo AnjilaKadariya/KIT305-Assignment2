@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "749473343759",
+    "project_id": "kit305-assignment2-5ff59",
+    "storage_bucket": "kit305-assignment2-5ff59.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749473343759:android:6f6458cbbfbc8cafcef67a",
+        "android_client_info": {
+          "package_name": "au.edu.utas.kit305.assignment2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn4FR9FE8JUvW8T_CXuw5im1y17ETm1wI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
