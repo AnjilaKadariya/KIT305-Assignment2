@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
-    app:cardCornerRadius="10dp"
-    app:cardElevation="3dp"
-    app:cardBackgroundColor="#FFFFFF">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#1C2128">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,21 +15,21 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Gold accent line -->
+        <!-- Teal accent line -->
         <View
-            android:layout_width="40dp"
+            android:layout_width="32dp"
             android:layout_height="3dp"
-            android:background="#C9A84C"
-            android:layout_marginBottom="8dp"/>
+            android:background="#00BFA5"
+            android:layout_marginBottom="10dp"/>
 
         <TextView
             android:id="@+id/txtCustomerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Customer Name"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#1A1A2E"/>
+            android:textColor="#FFFFFF"/>
 
         <TextView
             android:id="@+id/txtAddress"
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:text="Address"
             android:textSize="13sp"
-            android:textColor="#757575"
+            android:textColor="#8B949E"
             android:layout_marginTop="4dp"/>
 
     </LinearLayout>
