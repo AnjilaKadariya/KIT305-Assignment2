@@ -1,5 +1,6 @@
 package au.edu.utas.kit305.assignment2
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -52,6 +53,11 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Log.e(FIREBASE_TAG, "Error loading houses", it)
             }
+        // Open Add House screen when button clicked
+        ui.btnAddHouse.setOnClickListener {
+            val intent = Intent(this, AddHouseActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     inner class HouseHolder(var ui: ListItemHouseBinding) :
@@ -71,11 +77,37 @@ class MainActivity : AppCompatActivity() {
             val house = houses[position]
             holder.ui.txtCustomerName.text = house.customerName ?: "No name"
             holder.ui.txtAddress.text = house.address ?: "No address"
+
+            // Click on house card to open details
+            holder.itemView.setOnClickListener {
+                val intent = Intent(this@MainActivity, HouseDetailActivity::class.java)
+                intent.putExtra("HOUSE_ID", house.id)
+                intent.putExtra("HOUSE_NAME", house.customerName)
+                startActivity(intent)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        ui.houseList.adapter?.notifyDataSetChanged()
+        // Reload houses from Firebase every time we come back
+        val db = Firebase.firestore
+        db.collection("houses")
+            .get()
+            .addOnSuccessListener { result ->
+                items.clear()
+                for (document in result) {
+                    val house = document.toObject(House::class.java)
+                    house.id = document.id
+                    items.add(house)
+                }
+                // Show or hide empty state
+                if (items.isEmpty()) {
+                    ui.txtEmpty.visibility = android.view.View.VISIBLE
+                } else {
+                    ui.txtEmpty.visibility = android.view.View.GONE
+                }
+                (ui.houseList.adapter as HouseAdapter).notifyDataSetChanged()
+            }
     }
 }

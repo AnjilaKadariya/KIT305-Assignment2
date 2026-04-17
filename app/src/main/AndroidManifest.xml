@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.InteriorQuoteApp">
         <activity
+            android:name=".HouseDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddHouseActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
