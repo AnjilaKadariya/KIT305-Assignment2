@@ -14,8 +14,8 @@
         android:background="#1C2128"
         app:title="New Project"
         app:titleTextColor="#FFFFFF"
-        app:navigationIcon="@drawable/ic_back"
-        app:navigationIconTint="#00BFA5"/>
+        app:navigationIcon="@drawable/ic_back_white"
+        app:navigationIconTint="#FFFFFF"/>
 
     <!-- Scrollable content -->
     <ScrollView

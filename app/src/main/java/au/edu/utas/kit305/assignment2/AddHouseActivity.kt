@@ -1,5 +1,6 @@
 package au.edu.utas.kit305.assignment2
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -18,8 +19,6 @@ class AddHouseActivity : AppCompatActivity() {
         setContentView(ui.root)
 
         // Set up toolbar with back button
-        setSupportActionBar(ui.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         ui.toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -48,8 +47,9 @@ class AddHouseActivity : AppCompatActivity() {
 
     private fun saveHouse() {
         // Get values from fields
+        android.util.Log.d(FIREBASE_TAG, "Save clicked!")
         val customerName = ui.txtCustomerName.text.toString().trim()
-        val phone = ui.txtPhone.text.toString().trim()
+        val phone = ui.txtPhone.text.toString().trim().replace(" ", "").replace("-", "")
         val email = ui.txtEmail.text.toString().trim()
         val address = ui.txtAddress.text.toString().trim()
         val suburb = ui.txtSuburb.text.toString().trim()
@@ -93,8 +93,8 @@ class AddHouseActivity : AppCompatActivity() {
             ui.txtPostcode.requestFocus()
             return
         }
-        if (ui.spinnerPropertyType.selectedItemPosition == 0) {
-            Toast.makeText(this, "Please select a property type! 🏠", Toast.LENGTH_SHORT).show()
+        if (ui.spinnerPropertyType.selectedItem.toString() == "Select Property Type") {
+            Toast.makeText(this, "Please select a property type!", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -104,19 +104,18 @@ class AddHouseActivity : AppCompatActivity() {
         // Create House object
         val house = House(
             customerName = customerName,
-            address = fullAddress
+            address = fullAddress,
+            phone = phone,
+            propertyType = propertyType
         )
 
-        // Save to Firebase
+// Save to Firebase
         val db = Firebase.firestore
-        db.collection("houses")
-            .add(house)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Project saved! 🎉", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error saving project 😢", Toast.LENGTH_SHORT).show()
-            }
+        db.collection("houses").add(house)
+        Toast.makeText(this@AddHouseActivity, "Project saved! 🎉", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this@AddHouseActivity, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        startActivity(intent)
+        finish()
     }
 }

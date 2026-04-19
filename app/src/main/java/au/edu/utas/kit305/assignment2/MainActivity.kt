@@ -11,39 +11,82 @@ import com.google.firebase.firestore.firestore
 import au.edu.utas.kit305.assignment2.databinding.ActivityMainBinding
 import au.edu.utas.kit305.assignment2.databinding.ListItemHouseBinding
 
-// Tag for Firebase logging
 const val FIREBASE_TAG = "FirebaseLogging"
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var ui: ActivityMainBinding
-    private val items = mutableListOf<House>()
+
+    // allItems keeps ALL houses from Firebase
+    private val allItems = mutableListOf<House>()
+
+    // displayItems is what the RecyclerView shows
+    private val displayItems = mutableListOf<House>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityMainBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        // Set up RecyclerView
-        ui.houseList.adapter = HouseAdapter(items)
+        // Set up RecyclerView with displayItems
+        ui.houseList.adapter = HouseAdapter(displayItems)
         ui.houseList.layoutManager = LinearLayoutManager(this)
+
+        // Search bar filtering
+        ui.searchBar.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val query = s.toString().lowercase().trim()
+                displayItems.clear()
+                if (query.isEmpty()) {
+                    // Show all items when search is empty
+                    displayItems.addAll(allItems)
+                } else {
+                    // Filter from allItems
+                    val filtered = allItems.filter {
+                        it.customerName?.lowercase()?.contains(query) == true ||
+                                it.address?.lowercase()?.contains(query) == true
+                    }
+                    displayItems.addAll(filtered)
+                }
+                // Show empty state if no results
+                if (displayItems.isEmpty()) {
+                    ui.txtEmpty.visibility = android.view.View.VISIBLE
+                } else {
+                    ui.txtEmpty.visibility = android.view.View.GONE
+                }
+                (ui.houseList.adapter as HouseAdapter).notifyDataSetChanged()
+            }
+        })
 
         // Connect to Firebase
         val db = Firebase.firestore
         Log.d(FIREBASE_TAG, "Firebase connected: ${db.app.name}")
 
-        // Load houses from Firebase
+        // Open Add House screen when button clicked
+        ui.btnAddHouse.setOnClickListener {
+            val intent = Intent(this, AddHouseActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun loadHouses() {
+        val db = Firebase.firestore
         db.collection("houses")
             .get()
             .addOnSuccessListener { result ->
-                items.clear()
+                allItems.clear()
+                displayItems.clear()
                 for (document in result) {
                     val house = document.toObject(House::class.java)
                     house.id = document.id
-                    items.add(house)
+                    allItems.add(house)
                 }
-                // Show empty state if no projects
-                if (items.isEmpty()) {
+                // Clear search and show all
+                ui.searchBar.text.clear()
+                displayItems.addAll(allItems)
+                if (displayItems.isEmpty()) {
                     ui.txtEmpty.visibility = android.view.View.VISIBLE
                 } else {
                     ui.txtEmpty.visibility = android.view.View.GONE
@@ -53,11 +96,6 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Log.e(FIREBASE_TAG, "Error loading houses", it)
             }
-        // Open Add House screen when button clicked
-        ui.btnAddHouse.setOnClickListener {
-            val intent = Intent(this, AddHouseActivity::class.java)
-            startActivity(intent)
-        }
     }
 
     inner class HouseHolder(var ui: ListItemHouseBinding) :
@@ -90,24 +128,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Reload houses from Firebase every time we come back
-        val db = Firebase.firestore
-        db.collection("houses")
-            .get()
-            .addOnSuccessListener { result ->
-                items.clear()
-                for (document in result) {
-                    val house = document.toObject(House::class.java)
-                    house.id = document.id
-                    items.add(house)
-                }
-                // Show or hide empty state
-                if (items.isEmpty()) {
-                    ui.txtEmpty.visibility = android.view.View.VISIBLE
-                } else {
-                    ui.txtEmpty.visibility = android.view.View.GONE
-                }
-                (ui.houseList.adapter as HouseAdapter).notifyDataSetChanged()
-            }
+        // Reload from Firebase every time we come back
+        loadHouses()
     }
 }
