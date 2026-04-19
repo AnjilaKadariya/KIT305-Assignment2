@@ -15,30 +15,77 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Teal accent line -->
-        <View
-            android:layout_width="32dp"
-            android:layout_height="3dp"
-            android:background="#00BFA5"
-            android:layout_marginBottom="10dp"/>
-
-        <TextView
-            android:id="@+id/txtCustomerName"
+        <!-- Name row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Customer Name"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
-        <TextView
-            android:id="@+id/txtAddress"
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                app:tint="#8B949E"
+                android:layout_marginRight="12dp"/>
+
+            <TextView
+                android:id="@+id/txtCustomerName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Customer Name"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"/>
+        </LinearLayout>
+
+        <!-- Phone row -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Address"
-            android:textSize="13sp"
-            android:textColor="#8B949E"
-            android:layout_marginTop="4dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_call"
+                app:tint="#8B949E"
+                android:layout_marginRight="12dp"/>
+
+            <TextView
+                android:id="@+id/txtPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Phone"
+                android:textSize="14sp"
+                android:textColor="#8B949E"/>
+        </LinearLayout>
+
+        <!-- Address row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_mapmode"
+                app:tint="#8B949E"
+                android:layout_marginRight="12dp"/>
+
+            <TextView
+                android:id="@+id/txtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:textSize="14sp"
+                android:textColor="#8B949E"/>
+        </LinearLayout>
 
     </LinearLayout>
 
