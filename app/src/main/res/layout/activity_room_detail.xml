@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D1117">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#1C2128"
+        app:navigationIcon="@drawable/ic_back_white"
+        app:navigationIconTint="#FFFFFF"
+        app:titleTextColor="#FFFFFF"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Windows section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Windows"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/windowList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+            <TextView
+                android:id="@+id/txtNoWindows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No windows added yet"
+                android:textColor="#8B949E"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/btnAddWindow"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="+ Add Window"
+                android:backgroundTint="#1C2128"
+                android:textColor="#00BFA5"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#30363D"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Floor Spaces section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Floor Spaces"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/floorSpaceList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+            <TextView
+                android:id="@+id/txtNoFloorSpaces"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No floor spaces added yet"
+                android:textColor="#8B949E"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:padding="16dp"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/btnAddFloorSpace"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="+ Add Floor Space"
+                android:backgroundTint="#1C2128"
+                android:textColor="#00BFA5"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#30363D"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Room Photo section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Room Photo"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <Button
+                android:id="@+id/btnAddPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="+ Add Photo"
+                android:backgroundTint="#1C2128"
+                android:textColor="#00BFA5"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

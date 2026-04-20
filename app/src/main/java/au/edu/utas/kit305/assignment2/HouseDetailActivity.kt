@@ -139,6 +139,14 @@ class HouseDetailActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: RoomHolder, position: Int) {
             val room = roomList[position]
             holder.ui.txtRoomName.text = room.name ?: "No name"
+
+            holder.itemView.setOnClickListener {
+                val intent = android.content.Intent(this@HouseDetailActivity, RoomDetailActivity::class.java)
+                intent.putExtra("HOUSE_ID", houseId)
+                intent.putExtra("ROOM_ID", room.id)
+                intent.putExtra("ROOM_NAME", room.name)
+                startActivity(intent)
+            }
         }
     }
 }
