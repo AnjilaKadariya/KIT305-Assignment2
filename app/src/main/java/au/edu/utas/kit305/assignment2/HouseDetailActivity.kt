@@ -1,14 +1,18 @@
 package au.edu.utas.kit305.assignment2
 
 import android.app.AlertDialog
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.Firebase
@@ -22,6 +26,9 @@ class HouseDetailActivity : AppCompatActivity() {
     private var houseId: String? = null
     private val rooms = mutableListOf<Room>()
 
+    // Track which rooms are selected for quote
+    private val selectedRooms = mutableSetOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ui = ActivityHouseDetailBinding.inflate(layoutInflater)
@@ -30,23 +37,137 @@ class HouseDetailActivity : AppCompatActivity() {
         houseId = intent.getStringExtra("HOUSE_ID")
         val houseName = intent.getStringExtra("HOUSE_NAME")
 
-        // Toolbar
         ui.toolbar.title = houseName ?: "Project Details"
         ui.toolbar.setNavigationOnClickListener { finish() }
 
-        // RecyclerView
+        // Edit house button
+        ui.btnEditHouse.setOnClickListener {
+            showEditHouseDialog()
+        }
+
         ui.roomList.layoutManager = LinearLayoutManager(this)
         ui.roomList.adapter = RoomAdapter(rooms)
 
-        // Load house details
-        loadHouseDetails()
+        // Swipe to delete with red background
+        val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
 
-        // Load rooms
+            override fun onChildDraw(
+                c: Canvas, recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float,
+                actionState: Int, isCurrentlyActive: Boolean
+            ) {
+                val itemView = viewHolder.itemView
+                val paint = Paint()
+                paint.color = Color.parseColor("#CC0000")
+                c.drawRect(
+                    itemView.right + dX, itemView.top.toFloat(),
+                    itemView.right.toFloat(), itemView.bottom.toFloat(), paint
+                )
+                val icon = ContextCompat.getDrawable(this@HouseDetailActivity, android.R.drawable.ic_menu_delete)
+                icon?.let {
+                    val iconMargin = (itemView.height - it.intrinsicHeight) / 2
+                    val iconTop = itemView.top + iconMargin
+                    val iconBottom = iconTop + it.intrinsicHeight
+                    val iconLeft = itemView.right - iconMargin - it.intrinsicWidth
+                    val iconRight = itemView.right - iconMargin
+                    it.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    it.draw(c)
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val room = rooms[position]
+                AlertDialog.Builder(this@HouseDetailActivity)
+                    .setTitle("Delete Room")
+                    .setMessage("Are you sure you want to delete '${room.name}'?")
+                    .setPositiveButton("Delete") { _, _ -> deleteRoom(room, position) }
+                    .setNegativeButton("Cancel") { _, _ ->
+                        ui.roomList.adapter?.notifyDataSetChanged()
+                    }
+                    .show()
+            }
+        }
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(ui.roomList)
+
+        // Snackbar hint
+        com.google.android.material.snackbar.Snackbar.make(
+            ui.root,
+            "💡 Swipe left to delete, long press to edit room name",
+            com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+        ).show()
+
+        loadHouseDetails()
         loadRooms()
 
-        // Add room button
-        ui.btnAddRoom.setOnClickListener {
-            showAddRoomDialog()
+        ui.btnAddRoom.setOnClickListener { showAddRoomDialog() }
+
+        // Generate quote with selected rooms only
+        ui.btnGenerateQuote.setOnClickListener {
+            if (selectedRooms.isEmpty()) {
+                Toast.makeText(this, "Please select at least one room!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Generating quote for ${selectedRooms.size} room(s)... coming soon!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Show dialog to edit house details
+    private fun showEditHouseDialog() {
+        val db = Firebase.firestore
+        houseId?.let { id ->
+            db.collection("houses").document(id).get()
+                .addOnSuccessListener { doc ->
+                    val nameInput = EditText(this)
+                    nameInput.hint = "Customer Name"
+                    nameInput.setText(doc.getString("customerName"))
+                    nameInput.setPadding(48, 32, 48, 32)
+
+                    AlertDialog.Builder(this)
+                        .setTitle("Edit House Details")
+                        .setView(nameInput)
+                        .setPositiveButton("Save") { _, _ ->
+                            val newName = nameInput.text.toString().trim()
+                            if (newName.isEmpty()) {
+                                Toast.makeText(this, "Name cannot be empty!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                db.collection("houses").document(id)
+                                    .update("customerName", newName)
+                                    .addOnSuccessListener {
+                                        ui.toolbar.title = newName
+                                        Toast.makeText(this, "Updated! ✅", Toast.LENGTH_SHORT).show()
+                                    }
+                            }
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+        }
+    }
+
+    private fun deleteRoom(room: Room, position: Int) {
+        val db = Firebase.firestore
+        houseId?.let { id ->
+            room.id?.let { rid ->
+                db.collection("houses").document(id)
+                    .collection("rooms").document(rid)
+                    .delete()
+                    .addOnSuccessListener {
+                        rooms.removeAt(position)
+                        ui.roomList.adapter?.notifyDataSetChanged()
+                        Toast.makeText(this, "Room deleted!", Toast.LENGTH_SHORT).show()
+                        if (rooms.isEmpty()) {
+                            ui.txtEmpty.visibility = View.VISIBLE
+                            ui.roomList.visibility = View.GONE
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error deleting room", Toast.LENGTH_SHORT).show()
+                        ui.roomList.adapter?.notifyDataSetChanged()
+                    }
+            }
         }
     }
 
@@ -80,7 +201,7 @@ class HouseDetailActivity : AppCompatActivity() {
                         ui.txtEmpty.visibility = View.GONE
                         ui.roomList.visibility = View.VISIBLE
                     }
-                    (ui.roomList.adapter as RoomAdapter).notifyDataSetChanged()
+                    ui.roomList.adapter?.notifyDataSetChanged()
                 }
                 .addOnFailureListener {
                     Log.e(FIREBASE_TAG, "Error loading rooms", it)
@@ -106,6 +227,42 @@ class HouseDetailActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun showEditRoomDialog(room: Room, position: Int) {
+        val input = EditText(this)
+        input.setText(room.name)
+        input.setPadding(48, 32, 48, 32)
+
+        AlertDialog.Builder(this)
+            .setTitle("Edit Room")
+            .setView(input)
+            .setPositiveButton("Save") { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isEmpty()) {
+                    Toast.makeText(this, "Please enter a room name!", Toast.LENGTH_SHORT).show()
+                } else {
+                    updateRoom(room, name, position)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun updateRoom(room: Room, newName: String, position: Int) {
+        val db = Firebase.firestore
+        houseId?.let { id ->
+            room.id?.let { rid ->
+                db.collection("houses").document(id)
+                    .collection("rooms").document(rid)
+                    .update("name", newName)
+                    .addOnSuccessListener {
+                        rooms[position].name = newName
+                        ui.roomList.adapter?.notifyItemChanged(position)
+                        Toast.makeText(this, "Room updated! ✅", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
     }
 
     private fun saveRoom(name: String) {
@@ -139,13 +296,52 @@ class HouseDetailActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: RoomHolder, position: Int) {
             val room = roomList[position]
             holder.ui.txtRoomName.text = room.name ?: "No name"
+            holder.ui.txtWindowCount.text = "Windows: loading..."
+            holder.ui.txtFloorCount.text = "Floor spaces: loading..."
+            holder.ui.txtLabourCost.text = "Labour: $200"
 
+            // Load window and floor space counts from Firebase
+            val db = Firebase.firestore
+            houseId?.let { hid ->
+                room.id?.let { rid ->
+                    db.collection("houses").document(hid)
+                        .collection("rooms").document(rid)
+                        .collection("windows").get()
+                        .addOnSuccessListener { w ->
+                            holder.ui.txtWindowCount.text = "${w.size()} Window(s)"
+                        }
+                    db.collection("houses").document(hid)
+                        .collection("rooms").document(rid)
+                        .collection("floorspaces").get()
+                        .addOnSuccessListener { f ->
+                            holder.ui.txtFloorCount.text = "${f.size()} Floor Space(s)"
+                        }
+                }
+            }
+
+            // Checkbox to select/deselect room for quote
+            holder.ui.checkRoom.isChecked = selectedRooms.contains(room.id)
+            holder.ui.checkRoom.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    room.id?.let { selectedRooms.add(it) }
+                } else {
+                    room.id?.let { selectedRooms.remove(it) }
+                }
+            }
+
+            // Click card to open room detail
             holder.itemView.setOnClickListener {
                 val intent = android.content.Intent(this@HouseDetailActivity, RoomDetailActivity::class.java)
                 intent.putExtra("HOUSE_ID", houseId)
                 intent.putExtra("ROOM_ID", room.id)
                 intent.putExtra("ROOM_NAME", room.name)
                 startActivity(intent)
+            }
+
+            // Long press to edit room name
+            holder.itemView.setOnLongClickListener {
+                showEditRoomDialog(room, position)
+                true
             }
         }
     }

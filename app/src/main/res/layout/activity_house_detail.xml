@@ -4,19 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0D1117">
+    android:background="#0D1117"
+    android:fitsSystemWindows="true">
 
-    <!-- Toolbar -->
+    <!-- Toolbar with back button and edit icon -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#1C2128"
+        android:paddingTop="8dp"
         app:navigationIcon="@drawable/ic_back_white"
         app:navigationIconTint="#FFFFFF"
-        app:titleTextColor="#FFFFFF"/>
+        app:titleTextColor="#FFFFFF">
 
-    <!-- Property info -->
+        <ImageButton
+            android:id="@+id/btnEditHouse"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end"
+            android:src="@android:drawable/ic_menu_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="#FFFFFF"
+            android:padding="2dp"
+            android:layout_marginEnd="12dp"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Property type and address info -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +56,7 @@
 
     </LinearLayout>
 
-    <!-- Rooms label -->
+    <!-- Rooms section label -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +66,7 @@
         android:textStyle="bold"
         android:padding="16dp"/>
 
-    <!-- Rooms list -->
+    <!-- Rooms RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/roomList"
         android:layout_width="match_parent"
@@ -60,7 +75,7 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"/>
 
-    <!-- Empty state -->
+    <!-- Empty state when no rooms -->
     <TextView
         android:id="@+id/txtEmpty"
         android:layout_width="match_parent"

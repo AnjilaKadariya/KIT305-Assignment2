@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#1C2128"
+        android:paddingTop="8dp"
         app:title="New Project"
         app:titleTextColor="#FFFFFF"
         app:navigationIcon="@drawable/ic_back_white"

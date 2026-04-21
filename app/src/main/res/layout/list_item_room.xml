@@ -12,16 +12,55 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/txtRoomName"
-            android:layout_width="match_parent"
+        <!-- Room info -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtRoomName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/txtWindowCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#8B949E"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/txtFloorCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#8B949E"
+                android:textSize="13sp"/>
+
+            <TextView
+                android:id="@+id/txtLabourCost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#00BFA5"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <!-- Checkbox for quote selection -->
+        <CheckBox
+            android:id="@+id/checkRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="#00BFA5"/>
 
     </LinearLayout>
 
