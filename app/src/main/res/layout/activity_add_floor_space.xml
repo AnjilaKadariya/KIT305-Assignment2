@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0D1117">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#1C2128"
+        app:title="Add Floor Space"
+        app:titleTextColor="#FFFFFF"
+        app:navigationIcon="@drawable/ic_back_white"
+        app:navigationIconTint="#FFFFFF"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Floor Space Name -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Floor Space Name"
+                android:textColor="#8B949E"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp"/>
+
+            <EditText
+                android:id="@+id/txtFloorSpaceName"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/field_bg"
+                android:hint="e.g. Main Floor"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#555555"
+                android:textSize="14sp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:inputType="textCapWords"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Width -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Width (m)"
+                android:textColor="#8B949E"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp"/>
+
+            <EditText
+                android:id="@+id/txtWidth"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/field_bg"
+                android:hint="e.g. 3.5"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#555555"
+                android:textSize="14sp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Depth -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Depth (m)"
+                android:textColor="#8B949E"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp"/>
+
+            <EditText
+                android:id="@+id/txtDepth"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/field_bg"
+                android:hint="e.g. 3.2"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#555555"
+                android:textSize="14sp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:inputType="numberDecimal"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Product -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Product"
+                android:textColor="#8B949E"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp"/>
+
+            <LinearLayout
+                android:id="@+id/btnChooseProduct"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/field_bg"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/txtProductName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Choose Product"
+                    android:textColor="#555555"
+                    android:textSize="14sp"/>
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="#8B949E"/>
+
+            </LinearLayout>
+
+            <!-- Estimated Price -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Estimated Price"
+                android:textColor="#8B949E"
+                android:textSize="12sp"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:id="@+id/txtEstimatedPrice"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/field_bg"
+                android:text="Select product to calculate"
+                android:textColor="#555555"
+                android:textSize="14sp"
+                android:paddingLeft="16dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Save"
+                    android:backgroundTint="#00BFA5"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:layout_marginRight="8dp"/>
+
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:text="Cancel"
+                    android:backgroundTint="#CC0000"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

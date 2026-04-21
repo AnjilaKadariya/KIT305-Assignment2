@@ -47,7 +47,7 @@ class RoomDetailActivity : AppCompatActivity() {
 
         // Add window button
         ui.btnAddWindow.setOnClickListener {
-            val intent = android.content.Intent(this, AddWindowActivity::class.java)
+           val intent = android.content.Intent(this, AddWindowActivity::class.java)
             intent.putExtra("HOUSE_ID", houseId)
             intent.putExtra("ROOM_ID", roomId)
             startActivity(intent)
@@ -55,7 +55,7 @@ class RoomDetailActivity : AppCompatActivity() {
 
         // Add floor space button
         ui.btnAddFloorSpace.setOnClickListener {
-            val intent = android.content.Intent(this, AddFloorSpaceActivity::class.java)
+           val intent = android.content.Intent(this, AddFloorSpaceActivity::class.java)
             intent.putExtra("HOUSE_ID", houseId)
             intent.putExtra("ROOM_ID", roomId)
             startActivity(intent)
