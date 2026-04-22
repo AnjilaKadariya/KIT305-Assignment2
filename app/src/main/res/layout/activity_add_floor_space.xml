@@ -6,6 +6,12 @@
     android:orientation="vertical"
     android:background="#0D1117">
 
+    <!-- Status bar spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="#1C2128"/>
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"

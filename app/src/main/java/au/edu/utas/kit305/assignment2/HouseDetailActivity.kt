@@ -40,9 +40,11 @@ class HouseDetailActivity : AppCompatActivity() {
         ui.toolbar.title = houseName ?: "Project Details"
         ui.toolbar.setNavigationOnClickListener { finish() }
 
-        // Edit house button
+        // Edit house button → opens full form pre-filled
         ui.btnEditHouse.setOnClickListener {
-            showEditHouseDialog()
+            val intent = android.content.Intent(this, AddHouseActivity::class.java)
+            intent.putExtra("HOUSE_ID", houseId)
+            startActivity(intent)
         }
 
         ui.roomList.layoutManager = LinearLayoutManager(this)
@@ -114,39 +116,6 @@ class HouseDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Show dialog to edit house details
-    private fun showEditHouseDialog() {
-        val db = Firebase.firestore
-        houseId?.let { id ->
-            db.collection("houses").document(id).get()
-                .addOnSuccessListener { doc ->
-                    val nameInput = EditText(this)
-                    nameInput.hint = "Customer Name"
-                    nameInput.setText(doc.getString("customerName"))
-                    nameInput.setPadding(48, 32, 48, 32)
-
-                    AlertDialog.Builder(this)
-                        .setTitle("Edit House Details")
-                        .setView(nameInput)
-                        .setPositiveButton("Save") { _, _ ->
-                            val newName = nameInput.text.toString().trim()
-                            if (newName.isEmpty()) {
-                                Toast.makeText(this, "Name cannot be empty!", Toast.LENGTH_SHORT).show()
-                            } else {
-                                db.collection("houses").document(id)
-                                    .update("customerName", newName)
-                                    .addOnSuccessListener {
-                                        ui.toolbar.title = newName
-                                        Toast.makeText(this, "Updated! ✅", Toast.LENGTH_SHORT).show()
-                                    }
-                            }
-                        }
-                        .setNegativeButton("Cancel", null)
-                        .show()
-                }
-        }
-    }
-
     private fun deleteRoom(room: Room, position: Int) {
         val db = Firebase.firestore
         houseId?.let { id ->
@@ -180,6 +149,13 @@ class HouseDetailActivity : AppCompatActivity() {
                     ui.txtAddress.text = doc.getString("address") ?: ""
                 }
         }
+    }
+
+    // Reload house details when coming back from edit
+    override fun onResume() {
+        super.onResume()
+        loadHouseDetails()
+        loadRooms()
     }
 
     private fun loadRooms() {

@@ -7,27 +7,32 @@
     android:background="#0D1117"
     android:fitsSystemWindows="true">
 
+    <!-- Status bar spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="#1C2128"/>
+
     <!-- Toolbar with back button and edit icon -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="#1C2128"
-        android:paddingTop="8dp"
         app:navigationIcon="@drawable/ic_back_white"
         app:navigationIconTint="#FFFFFF"
         app:titleTextColor="#FFFFFF">
 
         <ImageButton
             android:id="@+id/btnEditHouse"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="end"
-            android:src="@android:drawable/ic_menu_edit"
+            android:src="@drawable/ic_edit"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="#FFFFFF"
-            android:padding="2dp"
-            android:layout_marginEnd="12dp"/>
+            android:padding="6dp"
+            android:layout_marginEnd="12dp"
+            app:tint="#FFFFFF"/>
 
     </androidx.appcompat.widget.Toolbar>
 
