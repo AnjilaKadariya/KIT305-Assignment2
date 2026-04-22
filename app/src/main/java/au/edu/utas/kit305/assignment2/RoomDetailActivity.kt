@@ -307,6 +307,11 @@ class RoomDetailActivity : AppCompatActivity() {
                 intent.putExtra("WINDOW_NAME", window.name)
                 intent.putExtra("WINDOW_WIDTH", window.width)
                 intent.putExtra("WINDOW_HEIGHT", window.height)
+                intent.putExtra("WINDOW_PRODUCT", window.productName)
+                intent.putExtra("WINDOW_COLOUR", window.productColour)
+                intent.putExtra("WINDOW_PRICE", window.estimatedPrice)
+                intent.putExtra("WINDOW_PRICE_PER_M2", window.pricePerM2)
+                intent.putExtra("WINDOW_LABOUR", window.labourCost)
                 startActivity(intent)
             }
         }
@@ -338,6 +343,11 @@ class RoomDetailActivity : AppCompatActivity() {
                 intent.putExtra("FLOOR_NAME", fs.name)
                 intent.putExtra("FLOOR_WIDTH", fs.width)
                 intent.putExtra("FLOOR_DEPTH", fs.depth)
+                intent.putExtra("FLOOR_PRODUCT", fs.productName)
+                intent.putExtra("FLOOR_COLOUR", fs.productColour)
+                intent.putExtra("FLOOR_PRICE", fs.estimatedPrice)
+                intent.putExtra("FLOOR_PRICE_PER_M2", fs.pricePerM2)
+                intent.putExtra("FLOOR_LABOUR", fs.labourCost)
                 startActivity(intent)
             }
         }
