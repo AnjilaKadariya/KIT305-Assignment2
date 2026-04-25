@@ -4,42 +4,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0D1117">
+    android:background="#F0F2F0">
 
-    <!-- Status bar spacer -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:background="#1C2128"/>
-
-    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
-    android:id="@+id/toolbar"
-    android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
-    android:background="#1C2128"
-    app:navigationIcon="@drawable/ic_back_white"
-    app:navigationIconTint="#FFFFFF"
-    app:titleTextColor="#FFFFFF">
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        app:navigationIcon="@drawable/ic_back_white"
+        app:navigationIconTint="#1A1A1A"
+        app:titleTextColor="#1A1A1A">
 
-    <ImageButton
-        android:id="@+id/btnDeleteRoom"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="end"
-        android:src="@drawable/ic_delete"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="6dp"
-        android:layout_marginEnd="12dp"
-        app:tint="#FFFFFF"/>
+        <ImageButton
+            android:id="@+id/btnDeleteRoom"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:layout_marginEnd="12dp"
+            app:tint="#CC0000"/>
 
-</androidx.appcompat.widget.Toolbar>
+    </androidx.appcompat.widget.Toolbar>
 
-    <!-- Gap between toolbar and content -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:background="#0D1117"/>
+        android:layout_height="8dp"
+        android:background="#F0F2F0"/>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -51,14 +44,14 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Windows section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Windows"
-                android:textColor="#FFFFFF"
+                android:textColor="#1A1A1A"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:layout_marginBottom="8dp"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -72,8 +65,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="No windows added yet"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="13sp"
+                android:fontFamily="sans-serif"
                 android:gravity="center"
                 android:padding="16dp"
                 android:visibility="gone"/>
@@ -81,29 +75,29 @@
             <Button
                 android:id="@+id/btnAddWindow"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_height="44dp"
                 android:text="+ Add Window"
-                android:backgroundTint="#1C2128"
-                android:textColor="#00BFA5"
+                android:backgroundTint="#E8F5EE"
+                android:textColor="#1B8A5A"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#30363D"
+                android:background="#E0E0E0"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Floor Spaces section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Floor Spaces"
-                android:textColor="#FFFFFF"
+                android:textColor="#1A1A1A"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:layout_marginBottom="8dp"/>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -117,8 +111,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="No floor spaces added yet"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="13sp"
+                android:fontFamily="sans-serif"
                 android:gravity="center"
                 android:padding="16dp"
                 android:visibility="gone"/>
@@ -126,39 +121,40 @@
             <Button
                 android:id="@+id/btnAddFloorSpace"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_height="44dp"
                 android:text="+ Add Floor Space"
-                android:backgroundTint="#1C2128"
-                android:textColor="#00BFA5"
+                android:backgroundTint="#E8F5EE"
+                android:textColor="#1B8A5A"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#30363D"
+                android:background="#E0E0E0"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Room Photo section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Room Photo"
-                android:textColor="#FFFFFF"
+                android:textColor="#1A1A1A"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:layout_marginBottom="8dp"/>
 
             <Button
                 android:id="@+id/btnAddPhoto"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_height="44dp"
                 android:text="+ Add Photo"
-                android:backgroundTint="#1C2128"
-                android:textColor="#00BFA5"
-                android:textStyle="bold"/>
+                android:backgroundTint="#E8F5EE"
+                android:textColor="#1B8A5A"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"/>
 
         </LinearLayout>
     </ScrollView>

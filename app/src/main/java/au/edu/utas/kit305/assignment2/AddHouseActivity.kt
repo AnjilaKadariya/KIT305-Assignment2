@@ -28,6 +28,38 @@ class AddHouseActivity : AppCompatActivity() {
         ui.toolbar.title = if (isEditMode) "Edit Project" else "New Project"
         ui.toolbar.setNavigationOnClickListener { finish() }
 
+
+        // Show delete button only in edit mode
+        if (isEditMode) {
+            ui.btnDeleteHouse.visibility = android.view.View.VISIBLE
+            ui.toolbar.title = "Edit Project"
+            ui.btnSave.text = "Update Project"
+        } else {
+            ui.btnDeleteHouse.visibility = android.view.View.GONE
+        }
+
+// Delete button with confirmation
+        ui.btnDeleteHouse.setOnClickListener {
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Delete Project")
+                .setMessage("Are you sure you want to delete this project? All rooms, windows and floor spaces will be lost!")
+                .setPositiveButton("Delete") { _, _ ->
+                    val db = com.google.firebase.Firebase.firestore
+                    houseId?.let { id ->
+                        db.collection("houses").document(id).delete()
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "Project deleted!", Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                startActivity(intent)
+                                finish()
+                            }
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         // Set up property type dropdown
         val propertyTypes = arrayOf(
             "Select Property Type",

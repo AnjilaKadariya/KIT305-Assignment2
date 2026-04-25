@@ -4,26 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0D1117">
+    android:background="#F0F2F0">
 
-    <!-- Status bar spacer -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:background="#1C2128"/>
-
-    <!-- Top AppBar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#1C2128"
+        android:background="#FFFFFF"
         app:title="New Project"
-        app:titleTextColor="#FFFFFF"
+        app:titleTextColor="#1A1A1A"
         app:navigationIcon="@drawable/ic_back_white"
-        app:navigationIconTint="#FFFFFF"/>
+        app:navigationIconTint="#1A1A1A">
 
-    <!-- Scrollable content -->
+        <ImageButton
+            android:id="@+id/btnDeleteHouse"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            android:layout_marginEnd="12dp"
+            app:tint="#CC0000"
+            android:visibility="gone"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -35,13 +41,13 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Customer Name -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Customer Name *"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="6dp"/>
 
             <EditText
@@ -50,21 +56,22 @@
                 android:layout_height="56dp"
                 android:background="@drawable/field_bg"
                 android:hint="e.g. John Smith"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#555555"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#AAAAAA"
                 android:textSize="14sp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:inputType="textPersonName"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Phone Number -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Phone Number *"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="6dp"/>
 
             <EditText
@@ -73,22 +80,23 @@
                 android:layout_height="56dp"
                 android:background="@drawable/field_bg"
                 android:hint="e.g. 0412 345 678"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#555555"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#AAAAAA"
                 android:textSize="14sp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:inputType="phone"
                 android:maxLength="10"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Email -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Email Address (optional)"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="6dp"/>
 
             <EditText
@@ -97,21 +105,22 @@
                 android:layout_height="56dp"
                 android:background="@drawable/field_bg"
                 android:hint="e.g. john@email.com"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#555555"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#AAAAAA"
                 android:textSize="14sp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:inputType="textEmailAddress"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Address -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Street Address *"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="6dp"/>
 
             <EditText
@@ -120,15 +129,15 @@
                 android:layout_height="56dp"
                 android:background="@drawable/field_bg"
                 android:hint="e.g. 12 Philip Avenue"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#555555"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#AAAAAA"
                 android:textSize="14sp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:inputType="textPostalAddress"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- Suburb and Postcode -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -146,8 +155,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Suburb *"
-                        android:textColor="#8B949E"
+                        android:textColor="#888888"
                         android:textSize="12sp"
+                        android:fontFamily="sans-serif"
                         android:layout_marginBottom="6dp"/>
 
                     <EditText
@@ -156,9 +166,10 @@
                         android:layout_height="56dp"
                         android:background="@drawable/field_bg"
                         android:hint="Suburb"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#555555"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#AAAAAA"
                         android:textSize="14sp"
+                        android:fontFamily="sans-serif"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:inputType="textCapWords"/>
@@ -175,8 +186,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Postcode *"
-                        android:textColor="#8B949E"
+                        android:textColor="#888888"
                         android:textSize="12sp"
+                        android:fontFamily="sans-serif"
                         android:layout_marginBottom="6dp"/>
 
                     <EditText
@@ -185,9 +197,10 @@
                         android:layout_height="56dp"
                         android:background="@drawable/field_bg"
                         android:hint="0000"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#555555"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#AAAAAA"
                         android:textSize="14sp"
+                        android:fontFamily="sans-serif"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
                         android:inputType="number"
@@ -197,13 +210,13 @@
 
             </LinearLayout>
 
-            <!-- Property Type -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Property Type *"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="6dp"/>
 
             <Spinner
@@ -213,15 +226,15 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/field_bg"
                 android:paddingLeft="16dp"
-                android:popupBackground="#1C2128"/>
+                android:popupBackground="#FFFFFF"/>
 
-            <!-- Emergency Contact -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Emergency Contact (optional)"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="12sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="6dp"/>
 
             <EditText
@@ -230,23 +243,24 @@
                 android:layout_height="56dp"
                 android:background="@drawable/field_bg"
                 android:hint="e.g. 0412 345 678"
-                android:textColor="#FFFFFF"
-                android:textColorHint="#555555"
+                android:textColor="#1A1A1A"
+                android:textColorHint="#AAAAAA"
                 android:textSize="14sp"
+                android:fontFamily="sans-serif"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:inputType="phone"
                 android:layout_marginBottom="24dp"/>
 
-            <!-- Save Button -->
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="52dp"
                 android:text="Save Project"
-                android:backgroundTint="#00BFA5"
+                android:backgroundTint="#1B8A5A"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
                 android:textSize="16sp"/>
 
         </LinearLayout>

@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="#1C2128">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,6 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
-        <!-- Room info -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -27,40 +26,43 @@
                 android:id="@+id/txtRoomName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
+                android:textColor="#1A1A1A"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"/>
 
             <TextView
                 android:id="@+id/txtWindowCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#8B949E"
+                android:textColor="#888888"
                 android:textSize="13sp"
+                android:fontFamily="sans-serif"
                 android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/txtFloorCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#8B949E"
-                android:textSize="13sp"/>
+                android:textColor="#888888"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"/>
 
             <TextView
                 android:id="@+id/txtLabourCost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#00BFA5"
-                android:textSize="13sp"/>
+                android:textColor="#1B8A5A"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif"/>
 
         </LinearLayout>
 
-        <!-- Checkbox for quote selection -->
         <CheckBox
             android:id="@+id/checkRoom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:buttonTint="#00BFA5"/>
+            android:buttonTint="#1B8A5A"/>
 
     </LinearLayout>
 

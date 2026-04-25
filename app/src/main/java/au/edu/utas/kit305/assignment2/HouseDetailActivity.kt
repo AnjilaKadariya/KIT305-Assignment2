@@ -106,12 +106,51 @@ class HouseDetailActivity : AppCompatActivity() {
 
         ui.btnAddRoom.setOnClickListener { showAddRoomDialog() }
 
+// Discount button
+        var discountPercent = 0.0
+        ui.btnDiscount.setOnClickListener {
+            val input = EditText(this)
+            input.hint = "e.g. 10"
+            input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            input.setPadding(48, 32, 48, 32)
+            if (discountPercent > 0) input.setText(discountPercent.toString())
+
+            AlertDialog.Builder(this)
+                .setTitle("Add Discount %")
+                .setMessage("Enter discount percentage (e.g. 20 for 20%)")
+                .setView(input)
+                .setPositiveButton("Apply") { _, _ ->
+                    val value = input.text.toString().trim().toDoubleOrNull()
+                    if (value == null || value < 0 || value > 100) {
+                        Toast.makeText(this, "Please enter a valid discount (0-100)", Toast.LENGTH_SHORT).show()
+                    } else {
+                        discountPercent = value
+                        ui.btnDiscount.text = if (value > 0) "Discount: $value%" else "+ Discount"
+                        Toast.makeText(this, "Discount set to $value%!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
         // Generate quote with selected rooms only
         ui.btnGenerateQuote.setOnClickListener {
             if (selectedRooms.isEmpty()) {
                 Toast.makeText(this, "Please select at least one room!", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Generating quote for ${selectedRooms.size} room(s)... coming soon!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val db = Firebase.firestore
+            houseId?.let { id ->
+                db.collection("houses").document(id).get()
+                    .addOnSuccessListener { doc ->
+                        val name = doc.getString("customerName") ?: "Customer"
+                        val intent = android.content.Intent(this, QuoteActivity::class.java)
+                        intent.putExtra("HOUSE_ID", houseId)
+                        intent.putExtra("CUSTOMER_NAME", name)
+                        intent.putExtra("DISCOUNT", discountPercent)
+                        intent.putStringArrayListExtra("SELECTED_ROOMS", ArrayList(selectedRooms))
+                        startActivity(intent)
+                    }
             }
         }
     }

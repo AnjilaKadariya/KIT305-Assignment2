@@ -4,24 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0D1117"
-    android:fitsSystemWindows="true">
+    android:background="#F0F2F0">
 
-    <!-- Status bar spacer -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:background="#1C2128"/>
-
-    <!-- Toolbar with back button and edit icon -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#1C2128"
+        android:background="#FFFFFF"
         app:navigationIcon="@drawable/ic_back_white"
-        app:navigationIconTint="#FFFFFF"
-        app:titleTextColor="#FFFFFF">
+        app:navigationIconTint="#1A1A1A"
+        app:titleTextColor="#1A1A1A">
 
         <ImageButton
             android:id="@+id/btnEditHouse"
@@ -32,46 +24,57 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="6dp"
             android:layout_marginEnd="12dp"
-            app:tint="#FFFFFF"/>
+            app:tint="#1B8A5A"/>
 
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Property type and address info -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:background="#1C2128">
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="#FFFFFF">
 
         <TextView
             android:id="@+id/txtPropertyType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#8B949E"
+            android:textColor="#888888"
+            android:fontFamily="sans-serif"
             android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/txtAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#8B949E"
+            android:textColor="#888888"
+            android:fontFamily="sans-serif"
             android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="2dp"/>
 
     </LinearLayout>
 
-    <!-- Rooms section label -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#F0F2F0"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Rooms"
-        android:textColor="#FFFFFF"
+        android:textColor="#1A1A1A"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:padding="16dp"/>
+        android:fontFamily="sans-serif-medium"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"/>
 
-    <!-- Rooms RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/roomList"
         android:layout_width="match_parent"
@@ -80,33 +83,34 @@
         android:paddingLeft="8dp"
         android:paddingRight="8dp"/>
 
-    <!-- Empty state when no rooms -->
     <TextView
         android:id="@+id/txtEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="No rooms yet! Let's get measuring 📐"
-        android:textColor="#8B949E"
+        android:textColor="#888888"
         android:textSize="14sp"
+        android:fontFamily="sans-serif"
         android:gravity="center"
         android:padding="32dp"
         android:visibility="gone"/>
 
-    <!-- Bottom buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="#FFFFFF">
 
         <Button
             android:id="@+id/btnAddRoom"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="+ Add Room"
-            android:backgroundTint="#1C2128"
-            android:textColor="#00BFA5"
+            android:backgroundTint="#F0F2F0"
+            android:textColor="#1B8A5A"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="8dp"/>
 
         <Button
@@ -114,19 +118,21 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:text="+ Discount"
-            android:backgroundTint="#1C2128"
-            android:textColor="#00BFA5"
+            android:backgroundTint="#F0F2F0"
+            android:textColor="#1B8A5A"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="8dp"/>
 
         <Button
             android:id="@+id/btnGenerateQuote"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
             android:text="Generate Quote"
-            android:backgroundTint="#00BFA5"
+            android:backgroundTint="#1B8A5A"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             android:textSize="16sp"/>
 
     </LinearLayout>

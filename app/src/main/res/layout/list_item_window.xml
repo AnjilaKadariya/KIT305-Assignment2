@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="#1C2128">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,16 +19,18 @@
             android:id="@+id/txtWindowName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:textColor="#1A1A1A"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"/>
 
         <TextView
             android:id="@+id/txtWindowSize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#8B949E"
+            android:textColor="#888888"
             android:textSize="13sp"
+            android:fontFamily="sans-serif"
             android:layout_marginTop="4dp"/>
 
     </LinearLayout>
