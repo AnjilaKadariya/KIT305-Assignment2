@@ -17,7 +17,6 @@ class AddWindowActivity : AppCompatActivity() {
     private var windowId: String? = null
     private var isEditMode = false
 
-    // Store selected product info
     private var selectedProductName: String? = null
     private var selectedProductPricePerM2: Double = 0.0
     private var selectedProductLabour: Double = 0.0
@@ -45,7 +44,6 @@ class AddWindowActivity : AppCompatActivity() {
             ui.txtWidth.setText(intent.getFloatExtra("WINDOW_WIDTH", 0f).toString())
             ui.txtHeight.setText(intent.getFloatExtra("WINDOW_HEIGHT", 0f).toString())
 
-            // Also load saved product info
             val savedProduct = intent.getStringExtra("WINDOW_PRODUCT")
             val savedColour = intent.getStringExtra("WINDOW_COLOUR")
             val savedPrice = intent.getDoubleExtra("WINDOW_PRICE", 0.0)
@@ -56,15 +54,14 @@ class AddWindowActivity : AppCompatActivity() {
                 selectedProductPricePerM2 = intent.getDoubleExtra("WINDOW_PRICE_PER_M2", 0.0)
                 selectedProductLabour = intent.getDoubleExtra("WINDOW_LABOUR", 0.0)
                 ui.txtProductName.text = "$savedProduct ($savedColour)"
-                ui.txtProductName.setTextColor(android.graphics.Color.WHITE)
+                ui.txtProductName.setTextColor(android.graphics.Color.parseColor("#1A1A1A"))
                 ui.txtEstimatedPrice.text = "$${"%.2f".format(savedPrice)}"
-                ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#00BFA5"))
+                ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#1B8A5A"))
             }
         }
 
         ui.btnCancel.setOnClickListener { finish() }
 
-        // Choose product → open SelectProductActivity
         ui.btnChooseProduct.setOnClickListener {
             val widthStr = ui.txtWidth.text.toString().trim()
             val heightStr = ui.txtHeight.text.toString().trim()
@@ -84,7 +81,6 @@ class AddWindowActivity : AppCompatActivity() {
         }
     }
 
-    // Receive selected product back from SelectProductActivity
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_PRODUCT && resultCode == Activity.RESULT_OK && data != null) {
@@ -93,11 +89,9 @@ class AddWindowActivity : AppCompatActivity() {
             selectedProductLabour = data.getDoubleExtra("PRODUCT_LABOUR", 0.0)
             selectedProductColour = data.getStringExtra("PRODUCT_COLOUR")
 
-            // Show selected product name
-            ui.txtProductName.text = "$selectedProductName (${selectedProductColour})"
-            ui.txtProductName.setTextColor(android.graphics.Color.WHITE)
+            ui.txtProductName.text = "$selectedProductName ($selectedProductColour)"
+            ui.txtProductName.setTextColor(android.graphics.Color.parseColor("#1A1A1A"))
 
-            // Calculate and show estimated price
             updateEstimatedPrice()
         }
     }
@@ -110,7 +104,7 @@ class AddWindowActivity : AppCompatActivity() {
         val area = widthM * heightM
         val price = area * selectedProductPricePerM2 + selectedProductLabour
         ui.txtEstimatedPrice.text = "$${"%.2f".format(price)}"
-        ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#00BFA5"))
+        ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#1B8A5A"))
     }
 
     private fun validateFields(): Triple<String, Float, Float>? {

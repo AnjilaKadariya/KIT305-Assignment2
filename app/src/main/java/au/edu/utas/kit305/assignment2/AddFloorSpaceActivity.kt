@@ -17,7 +17,6 @@ class AddFloorSpaceActivity : AppCompatActivity() {
     private var floorId: String? = null
     private var isEditMode = false
 
-    // Store selected product info
     private var selectedProductName: String? = null
     private var selectedProductPricePerM2: Double = 0.0
     private var selectedProductLabour: Double = 0.0
@@ -55,15 +54,14 @@ class AddFloorSpaceActivity : AppCompatActivity() {
                 selectedProductPricePerM2 = intent.getDoubleExtra("FLOOR_PRICE_PER_M2", 0.0)
                 selectedProductLabour = intent.getDoubleExtra("FLOOR_LABOUR", 0.0)
                 ui.txtProductName.text = "$savedProduct ($savedColour)"
-                ui.txtProductName.setTextColor(android.graphics.Color.WHITE)
+                ui.txtProductName.setTextColor(android.graphics.Color.parseColor("#1A1A1A"))
                 ui.txtEstimatedPrice.text = "$${"%.2f".format(savedPrice)}"
-                ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#00BFA5"))
+                ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#1B8A5A"))
             }
         }
 
         ui.btnCancel.setOnClickListener { finish() }
 
-        // Choose product → open SelectProductActivity
         ui.btnChooseProduct.setOnClickListener {
             val widthStr = ui.txtWidth.text.toString().trim()
             val depthStr = ui.txtDepth.text.toString().trim()
@@ -83,7 +81,6 @@ class AddFloorSpaceActivity : AppCompatActivity() {
         }
     }
 
-    // Receive selected product back from SelectProductActivity
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_PRODUCT && resultCode == Activity.RESULT_OK && data != null) {
@@ -92,8 +89,8 @@ class AddFloorSpaceActivity : AppCompatActivity() {
             selectedProductLabour = data.getDoubleExtra("PRODUCT_LABOUR", 0.0)
             selectedProductColour = data.getStringExtra("PRODUCT_COLOUR")
 
-            ui.txtProductName.text = "$selectedProductName (${selectedProductColour})"
-            ui.txtProductName.setTextColor(android.graphics.Color.WHITE)
+            ui.txtProductName.text = "$selectedProductName ($selectedProductColour)"
+            ui.txtProductName.setTextColor(android.graphics.Color.parseColor("#1A1A1A"))
 
             updateEstimatedPrice()
         }
@@ -105,7 +102,7 @@ class AddFloorSpaceActivity : AppCompatActivity() {
         val area = width * depth
         val price = area * selectedProductPricePerM2 + selectedProductLabour
         ui.txtEstimatedPrice.text = "$${"%.2f".format(price)}"
-        ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#00BFA5"))
+        ui.txtEstimatedPrice.setTextColor(android.graphics.Color.parseColor("#1B8A5A"))
     }
 
     private fun validateFields(): Triple<String, Float, Float>? {

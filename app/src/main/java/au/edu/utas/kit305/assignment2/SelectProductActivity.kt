@@ -3,6 +3,7 @@ package au.edu.utas.kit305.assignment2
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -39,6 +40,9 @@ class SelectProductActivity : AppCompatActivity() {
     private var floorWidth: Float = 0f
     private var floorDepth: Float = 0f
 
+    private val windowCategories = setOf("Blind", "Curtain", "Shutter")
+    private val floorCategories = setOf("Carpet", "Timber", "Vinyl", "Rubber", "Concrete", "Cork", "Loop")
+
     private val allProducts = mutableListOf<Product>()
     private val filteredProducts = mutableListOf<Product>()
     private var selectedProduct: Product? = null
@@ -72,7 +76,6 @@ class SelectProductActivity : AppCompatActivity() {
 
         fetchProducts()
 
-        // When product type changes — update colours and filter
         ui.spinnerProductType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 updateColourSpinnerForType()
@@ -81,7 +84,6 @@ class SelectProductActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        // When colour changes — filter
         ui.spinnerColour.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 selectedColour = ui.spinnerColour.selectedItem.toString()
@@ -105,25 +107,32 @@ class SelectProductActivity : AppCompatActivity() {
             finish()
         }
     }
-
     private fun fetchProducts() {
         ui.progressBar.visibility = View.VISIBLE
         Thread {
             try {
-                val url = URL("https://utasbot.dev/kit305_2026/product")
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.connectTimeout = 10000
-                connection.readTimeout = 10000
+                val client = okhttp3.OkHttpClient.Builder()
+                    .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
 
-                val response = connection.inputStream.bufferedReader().readText()
-                val jsonObject = org.json.JSONObject(response)
+                val request = okhttp3.Request.Builder()
+                    .url("https://utasbot.dev/kit305_2026/product")
+                    .build()
+
+                val response = client.newCall(request).execute()
+                val body = response.body?.string() ?: ""
+
+                Log.d("PRODUCTS", "Response code: ${response.code}")
+                Log.d("PRODUCTS", "Body length: ${body.length}")
+
+                val jsonObject = org.json.JSONObject(body)
                 val jsonArray = jsonObject.getJSONArray("data")
+                Log.d("PRODUCTS", "Products: ${jsonArray.length()}")
 
                 val products = mutableListOf<Product>()
                 for (i in 0 until jsonArray.length()) {
                     val obj = jsonArray.getJSONObject(i)
-
                     val coloursArray = obj.optJSONArray("variants")
                     val colours = mutableListOf<String>()
                     if (coloursArray != null) {
@@ -131,8 +140,7 @@ class SelectProductActivity : AppCompatActivity() {
                             colours.add(coloursArray.getString(j))
                         }
                     }
-
-                    val product = Product(
+                    products.add(Product(
                         id = obj.optString("id", ""),
                         name = obj.optString("name", ""),
                         type = obj.optString("category", ""),
@@ -144,8 +152,7 @@ class SelectProductActivity : AppCompatActivity() {
                         minWidth = obj.optDouble("min_width", 0.0),
                         minHeight = obj.optDouble("min_height", 0.0),
                         minDepth = 0.0
-                    )
-                    products.add(product)
+                    ))
                 }
 
                 runOnUiThread {
@@ -154,9 +161,11 @@ class SelectProductActivity : AppCompatActivity() {
                     allProducts.addAll(products)
                     updateColourSpinner()
                     filterProducts()
+                    Toast.makeText(this, "Loaded ${products.size} products!", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
+                Log.e("PRODUCTS", "Error: ${e.message}", e)
                 runOnUiThread {
                     ui.progressBar.visibility = View.GONE
                     Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
@@ -165,12 +174,12 @@ class SelectProductActivity : AppCompatActivity() {
         }.start()
     }
 
-    // Initial colour spinner — shows all colours for category
     private fun updateColourSpinner() {
+        val validCategories = if (forType == "window") windowCategories else floorCategories
         val colours = mutableSetOf<String>()
         colours.add("All Colours")
         allProducts
-            .filter { if (forType == "window") it.type == "window" else it.type == "floor" }
+            .filter { it.type in validCategories }
             .forEach { colours.addAll(it.colours) }
 
         val colourAdapter = ArrayAdapter(this, R.layout.spinner_item, colours.toList())
@@ -178,37 +187,34 @@ class SelectProductActivity : AppCompatActivity() {
         ui.spinnerColour.adapter = colourAdapter
     }
 
-    // Update colour spinner when product type changes
     private fun updateColourSpinnerForType() {
+        val validCategories = if (forType == "window") windowCategories else floorCategories
         val selectedType = ui.spinnerProductType.selectedItem?.toString() ?: "All Types"
-
         val colours = mutableSetOf<String>()
         colours.add("All Colours")
-
         for (product in allProducts) {
-            if (forType == "window" && product.type != "window") continue
-            if (forType == "floorspace" && product.type != "floor") continue
-            if (selectedType != "All Types" && !product.name.contains(selectedType, ignoreCase = true)) continue
+            if (product.type !in validCategories) continue
+            if (selectedType != "All Types" && !product.type.equals(selectedType, ignoreCase = true)) continue
             colours.addAll(product.colours)
         }
-
         val colourAdapter = ArrayAdapter(this, R.layout.spinner_item, colours.toList())
         colourAdapter.setDropDownViewResource(R.layout.spinner_item)
         ui.spinnerColour.adapter = colourAdapter
     }
 
     private fun filterProducts() {
+        val validCategories = if (forType == "window") windowCategories else floorCategories
         val selectedType = ui.spinnerProductType.selectedItem?.toString() ?: "All Types"
         val selectedColour = ui.spinnerColour.selectedItem?.toString() ?: "All Colours"
 
         filteredProducts.clear()
         for (product in allProducts) {
-            if (forType == "window" && product.type != "window") continue
-            if (forType == "floorspace" && product.type != "floor") continue
-            if (selectedType != "All Types" && !product.name.contains(selectedType, ignoreCase = true)) continue
+            if (product.type !in validCategories) continue
+            if (selectedType != "All Types" && !product.type.equals(selectedType, ignoreCase = true)) continue
             if (selectedColour != "All Colours" && !product.colours.any { it.equals(selectedColour, ignoreCase = true) }) continue
             filteredProducts.add(product)
         }
+        Log.d("PRODUCTS", "filterProducts: ${filteredProducts.size} products after filter")
         ui.productList.adapter?.notifyDataSetChanged()
     }
 
