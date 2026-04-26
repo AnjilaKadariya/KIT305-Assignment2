@@ -1,23 +1,37 @@
 package au.edu.utas.kit305.assignment2
 
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
 import au.edu.utas.kit305.assignment2.databinding.ActivityRoomDetailBinding
 import au.edu.utas.kit305.assignment2.databinding.ListItemWindowBinding
 import au.edu.utas.kit305.assignment2.databinding.ListItemFloorSpaceBinding
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 class RoomDetailActivity : AppCompatActivity() {
 
@@ -28,6 +42,34 @@ class RoomDetailActivity : AppCompatActivity() {
     // Lists to hold windows and floor spaces loaded from Firebase
     private val windows = mutableListOf<Window>()
     private val floorSpaces = mutableListOf<FloorSpace>()
+
+    // URI pointing to the temp file the camera will write into
+    private var photoUri: Uri? = null
+
+    // Build the camera intent manually so we can add FLAG_GRANT_WRITE_URI_PERMISSION.
+    // TakePicture() contract omits this flag, which causes the camera to return
+    // RESULT_CANCELED immediately when given a FileProvider URI.
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            photoUri?.let { uploadPhoto(it) }
+        }
+    }
+
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) launchCamera()
+        else Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
+    }
+
+    // Gallery: user picks an image, we receive its content URI
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { uploadPhoto(it) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +115,7 @@ class RoomDetailActivity : AppCompatActivity() {
 
         // Add window button opens AddWindowActivity in add mode
         ui.btnAddWindow.setOnClickListener {
-            val intent = android.content.Intent(this, AddWindowActivity::class.java)
+            val intent = Intent(this, AddWindowActivity::class.java)
             intent.putExtra("HOUSE_ID", houseId)
             intent.putExtra("ROOM_ID", roomId)
             startActivity(intent)
@@ -81,15 +123,132 @@ class RoomDetailActivity : AppCompatActivity() {
 
         // Add floor space button opens AddFloorSpaceActivity in add mode
         ui.btnAddFloorSpace.setOnClickListener {
-            val intent = android.content.Intent(this, AddFloorSpaceActivity::class.java)
+            val intent = Intent(this, AddFloorSpaceActivity::class.java)
             intent.putExtra("HOUSE_ID", houseId)
             intent.putExtra("ROOM_ID", roomId)
             startActivity(intent)
         }
 
+        // Add photo button shows camera/gallery choice
+        ui.btnAddPhoto.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Add Room Photo")
+                .setItems(arrayOf("Take Photo", "Choose from Gallery")) { _, which ->
+                    if (which == 0) checkCameraPermissionAndLaunch() else launchGallery()
+                }
+                .show()
+        }
+
         // Load data from Firebase
         loadWindows()
         loadFloorSpaces()
+        loadRoomPhoto()
+    }
+
+    private fun checkCameraPermissionAndLaunch() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            launchCamera()
+        } else {
+            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+        }
+    }
+
+    // Create the output file in external app storage, wrap with FileProvider, then launch
+    // the camera intent with explicit write permission so the camera app can save the photo.
+    private fun launchCamera() {
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: cacheDir
+        val photoFile = File.createTempFile("room_photo_", ".jpg", storageDir)
+        photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+            addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        cameraLauncher.launch(intent)
+    }
+
+    private fun launchGallery() {
+        galleryLauncher.launch("image/*")
+    }
+
+    // Display from the local URI immediately, then compress + upload to Firebase Storage.
+    // Showing first means the photo always appears even if the upload is slow or fails.
+    private fun uploadPhoto(uri: Uri) {
+        val hid = houseId ?: return
+        val rid = roomId ?: return
+
+        // Show the photo right away from the local file — no waiting for network
+        ui.imgRoomPhoto.visibility = View.VISIBLE
+        Glide.with(this).load(uri).into(ui.imgRoomPhoto)
+        ui.btnAddPhoto.text = "Change Photo"
+
+        Toast.makeText(this, "Saving photo...", Toast.LENGTH_SHORT).show()
+
+        try {
+            val inputStream = contentResolver.openInputStream(uri) ?: return
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream.close()
+
+            if (bitmap == null) {
+                Toast.makeText(this, "Could not read photo", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+            val bytes = stream.toByteArray()
+
+            FirebaseStorage.getInstance().reference
+                .child("houses/$hid/rooms/$rid/photo.jpg")
+                .putBytes(bytes)
+                .addOnSuccessListener { taskSnapshot ->
+                    taskSnapshot.storage.downloadUrl
+                        .addOnSuccessListener { downloadUri ->
+                            Firebase.firestore
+                                .collection("houses").document(hid)
+                                .collection("rooms").document(rid)
+                                .set(
+                                    hashMapOf("photoUrl" to downloadUri.toString()),
+                                    com.google.firebase.firestore.SetOptions.merge()
+                                )
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Photo saved!", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(this, "Firestore save failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Could not get download URL: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(this, "Upload failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error processing photo: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // Read the photoUrl field from Firestore and display with Glide
+    private fun loadRoomPhoto() {
+        val hid = houseId ?: return
+        val rid = roomId ?: return
+
+        Firebase.firestore
+            .collection("houses").document(hid)
+            .collection("rooms").document(rid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val photoUrl = doc.getString("photoUrl")
+                if (!photoUrl.isNullOrEmpty()) {
+                    ui.imgRoomPhoto.visibility = View.VISIBLE
+                    Glide.with(this).load(photoUrl).into(ui.imgRoomPhoto)
+                    ui.btnAddPhoto.text = "Change Photo"
+                }
+            }
     }
 
     // Sets up swipe-to-delete with red background for a RecyclerView
@@ -279,6 +438,7 @@ class RoomDetailActivity : AppCompatActivity() {
         super.onResume()
         loadWindows()
         loadFloorSpaces()
+        loadRoomPhoto()
     }
 
     // ViewHolder for window list items
@@ -300,7 +460,7 @@ class RoomDetailActivity : AppCompatActivity() {
 
             // Tap window card to open edit screen with pre-filled data
             holder.itemView.setOnClickListener {
-                val intent = android.content.Intent(this@RoomDetailActivity, AddWindowActivity::class.java)
+                val intent = Intent(this@RoomDetailActivity, AddWindowActivity::class.java)
                 intent.putExtra("HOUSE_ID", houseId)
                 intent.putExtra("ROOM_ID", roomId)
                 intent.putExtra("WINDOW_ID", window.id)
@@ -336,7 +496,7 @@ class RoomDetailActivity : AppCompatActivity() {
 
             // Tap floor space card to open edit screen with pre-filled data
             holder.itemView.setOnClickListener {
-                val intent = android.content.Intent(this@RoomDetailActivity, AddFloorSpaceActivity::class.java)
+                val intent = Intent(this@RoomDetailActivity, AddFloorSpaceActivity::class.java)
                 intent.putExtra("HOUSE_ID", houseId)
                 intent.putExtra("ROOM_ID", roomId)
                 intent.putExtra("FLOOR_ID", fs.id)

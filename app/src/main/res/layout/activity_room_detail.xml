@@ -146,6 +146,15 @@
                 android:fontFamily="sans-serif-medium"
                 android:layout_marginBottom="8dp"/>
 
+            <ImageView
+                android:id="@+id/imgRoomPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:background="#E0E0E0"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"/>
+
             <Button
                 android:id="@+id/btnAddPhoto"
                 android:layout_width="wrap_content"
