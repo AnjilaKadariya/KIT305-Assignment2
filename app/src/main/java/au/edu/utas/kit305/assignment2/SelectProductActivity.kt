@@ -38,11 +38,11 @@ class SelectProductActivity : AppCompatActivity() {
     private var floorWidth: Float = 0f
     private var floorDepth: Float = 0f
 
-    private val allProducts = mutableListOf<Product>()
-    private val filteredProducts = mutableListOf<Product>()
+    private val allProducts = mutableListOf<Product>() // all from api
+    private val filteredProducts = mutableListOf<Product>() // shown in list
     private var selectedProduct: Product? = null
     private var selectedColour: String = ""
-    private var spinnerReady = false
+    private var spinnerReady = false // prevent early spinner fire
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

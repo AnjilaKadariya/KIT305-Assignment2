@@ -24,8 +24,8 @@ class HouseDetailActivity : AppCompatActivity() {
 
     private lateinit var ui: ActivityHouseDetailBinding
     private var houseId: String? = null
-    private val rooms = mutableListOf<Room>()
-    private val selectedRooms = mutableSetOf<String>()
+    private val rooms = mutableListOf<Room>() // loaded from firestore
+    private val selectedRooms = mutableSetOf<String>() // for quote generation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,7 +193,7 @@ class HouseDetailActivity : AppCompatActivity() {
                     rooms.clear()
                     for (doc in result!!) {
                         val room = doc.toObject(Room::class.java)
-                        room.id = doc.id
+                        room.id = doc.id // store doc id
                         rooms.add(room)
                     }
                     if (rooms.isEmpty()) {
@@ -314,7 +314,7 @@ class HouseDetailActivity : AppCompatActivity() {
                 }
             }
 
-            holder.ui.checkRoom.isChecked = selectedRooms.contains(room.id)
+            holder.ui.checkRoom.isChecked = selectedRooms.contains(room.id) // restore selection
             holder.ui.checkRoom.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked) {
                     room.id?.let { selectedRooms.add(it) }
@@ -331,7 +331,7 @@ class HouseDetailActivity : AppCompatActivity() {
                 startActivity(intent)
             }
 
-            holder.itemView.setOnLongClickListener {
+            holder.itemView.setOnLongClickListener { // long press to rename
                 showEditRoomDialog(room, position)
                 true
             }

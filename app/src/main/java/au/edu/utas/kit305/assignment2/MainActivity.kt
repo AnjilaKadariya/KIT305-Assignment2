@@ -16,8 +16,8 @@ const val FIREBASE_TAG = "FirebaseLogging"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var ui: ActivityMainBinding
-    private val allItems = mutableListOf<House>()
-    private val displayItems = mutableListOf<House>()
+    private val allItems = mutableListOf<House>() // all houses from firebase
+    private val displayItems = mutableListOf<House>() // filtered list shown
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         ui.houseList.adapter = HouseAdapter(displayItems)
         ui.houseList.layoutManager = LinearLayoutManager(this)
 
+        // filter as user types
         ui.searchBar.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
                 if (query.isEmpty()) {
                     displayItems.addAll(allItems)
                 } else {
+                    // match name or address
                     val filtered = allItems.filter {
                         it.customerName?.lowercase()?.contains(query) == true ||
                                 it.address?.lowercase()?.contains(query) == true
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
                     displayItems.addAll(filtered)
                 }
                 if (displayItems.isEmpty()) {
-                    ui.txtEmpty.visibility = android.view.View.VISIBLE
+                    ui.txtEmpty.visibility = android.view.View.VISIBLE // show empty label
                 } else {
                     ui.txtEmpty.visibility = android.view.View.GONE
                 }
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadHouses() {
         val db = Firebase.firestore
         db.collection("houses")
-            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING) // newest first
             .addSnapshotListener { result, error ->
                 if (error != null) {
                     Log.e(FIREBASE_TAG, "Error loading houses", error)
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                 displayItems.clear()
                 for (document in result!!) {
                     val house = document.toObject(House::class.java)
-                    house.id = document.id
+                    house.id = document.id // store document id locally
                     allItems.add(house)
                 }
                 val query = ui.searchBar.text.toString().lowercase().trim()
@@ -90,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 (ui.houseList.adapter as HouseAdapter).notifyDataSetChanged()
             }
     }
+
     inner class HouseHolder(var ui: ListItemHouseBinding) :
         RecyclerView.ViewHolder(ui.root) {}
 
@@ -109,6 +112,7 @@ class MainActivity : AppCompatActivity() {
             holder.ui.txtPhone.text = house.phone ?: "No phone"
             holder.ui.txtAddress.text = house.address ?: "No address"
 
+            // tap to open house
             holder.itemView.setOnClickListener {
                 val intent = Intent(this@MainActivity, HouseDetailActivity::class.java)
                 intent.putExtra("HOUSE_ID", house.id)
@@ -120,7 +124,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        loadHouses()
-
+        loadHouses() // refresh list on return
     }
 }

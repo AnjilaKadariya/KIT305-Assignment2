@@ -39,16 +39,12 @@ class RoomDetailActivity : AppCompatActivity() {
     private var houseId: String? = null
     private var roomId: String? = null
 
-    // Lists to hold windows and floor spaces loaded from Firebase
-    private val windows = mutableListOf<Window>()
-    private val floorSpaces = mutableListOf<FloorSpace>()
+    private val windows = mutableListOf<Window>() // loaded from firebase
+    private val floorSpaces = mutableListOf<FloorSpace>() // loaded from firebase
 
-    // URI pointing to the temp file the camera will write into
-    private var photoUri: Uri? = null
+    private var photoUri: Uri? = null // output uri for camera
 
-    // Build the camera intent manually so we can add FLAG_GRANT_WRITE_URI_PERMISSION.
-    // TakePicture() contract omits this flag, which causes the camera to return
-    // RESULT_CANCELED immediately when given a FileProvider URI.
+    // manual intent needed for write uri permission
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -64,7 +60,6 @@ class RoomDetailActivity : AppCompatActivity() {
         else Toast.makeText(this, "Camera permission is required", Toast.LENGTH_SHORT).show()
     }
 
-    // Gallery: user picks an image, we receive its content URI
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -76,34 +71,28 @@ class RoomDetailActivity : AppCompatActivity() {
         ui = ActivityRoomDetailBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        // Get house and room IDs passed from HouseDetailActivity
         houseId = intent.getStringExtra("HOUSE_ID")
         roomId = intent.getStringExtra("ROOM_ID")
         val roomName = intent.getStringExtra("ROOM_NAME")
 
-        // Set toolbar title to room name
         ui.toolbar.title = roomName ?: "Room"
         ui.toolbar.setNavigationOnClickListener { finish() }
 
-        // Set up RecyclerViews with their adapters
         ui.windowList.layoutManager = LinearLayoutManager(this)
         ui.windowList.adapter = WindowAdapter(windows)
 
         ui.floorSpaceList.layoutManager = LinearLayoutManager(this)
         ui.floorSpaceList.adapter = FloorSpaceAdapter(floorSpaces)
 
-        // Attach swipe-to-delete for both lists
         setupSwipeToDelete(ui.windowList, isWindow = true)
         setupSwipeToDelete(ui.floorSpaceList, isWindow = false)
 
-        // Show hint to user about swipe and tap features
         com.google.android.material.snackbar.Snackbar.make(
             ui.root,
             "💡 Tap to edit, swipe left to delete",
             com.google.android.material.snackbar.Snackbar.LENGTH_LONG
         ).show()
 
-        // Delete room button with confirmation dialog
         ui.btnDeleteRoom.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Delete Room")
@@ -113,7 +102,6 @@ class RoomDetailActivity : AppCompatActivity() {
                 .show()
         }
 
-        // Add window button opens AddWindowActivity in add mode
         ui.btnAddWindow.setOnClickListener {
             val intent = Intent(this, AddWindowActivity::class.java)
             intent.putExtra("HOUSE_ID", houseId)
@@ -121,7 +109,6 @@ class RoomDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Add floor space button opens AddFloorSpaceActivity in add mode
         ui.btnAddFloorSpace.setOnClickListener {
             val intent = Intent(this, AddFloorSpaceActivity::class.java)
             intent.putExtra("HOUSE_ID", houseId)
@@ -129,7 +116,7 @@ class RoomDetailActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Add photo button shows camera/gallery choice
+        // camera or gallery picker
         ui.btnAddPhoto.setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle("Add Room Photo")
@@ -139,7 +126,6 @@ class RoomDetailActivity : AppCompatActivity() {
                 .show()
         }
 
-        // Load data from Firebase
         loadWindows()
         loadFloorSpaces()
         loadRoomPhoto()
@@ -155,12 +141,10 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Create the output file in external app storage, wrap with FileProvider, then launch
-    // the camera intent with explicit write permission so the camera app can save the photo.
     private fun launchCamera() {
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: cacheDir
         val photoFile = File.createTempFile("room_photo_", ".jpg", storageDir)
-        photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+        photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile) // wrap with fileprovider
 
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
@@ -173,13 +157,11 @@ class RoomDetailActivity : AppCompatActivity() {
         galleryLauncher.launch("image/*")
     }
 
-    // Display from the local URI immediately, then compress + upload to Firebase Storage.
-    // Showing first means the photo always appears even if the upload is slow or fails.
+    // show local file first, then upload in background
     private fun uploadPhoto(uri: Uri) {
         val hid = houseId ?: return
         val rid = roomId ?: return
 
-        // Show the photo right away from the local file — no waiting for network
         ui.imgRoomPhoto.visibility = View.VISIBLE
         Glide.with(this).load(uri).into(ui.imgRoomPhoto)
         ui.btnAddPhoto.text = "Change Photo"
@@ -232,7 +214,6 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Read the photoUrl field from Firestore and display with Glide
     private fun loadRoomPhoto() {
         val hid = houseId ?: return
         val rid = roomId ?: return
@@ -251,12 +232,10 @@ class RoomDetailActivity : AppCompatActivity() {
             }
     }
 
-    // Sets up swipe-to-delete with red background for a RecyclerView
     private fun setupSwipeToDelete(recyclerView: RecyclerView, isWindow: Boolean) {
         val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             override fun onMove(rv: RecyclerView, vh: RecyclerView.ViewHolder, t: RecyclerView.ViewHolder) = false
 
-            // Draw red background and delete icon while swiping
             override fun onChildDraw(
                 c: Canvas, recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float,
@@ -269,7 +248,6 @@ class RoomDetailActivity : AppCompatActivity() {
                     itemView.right + dX, itemView.top.toFloat(),
                     itemView.right.toFloat(), itemView.bottom.toFloat(), paint
                 )
-                // Draw delete icon on the red background
                 val icon = ContextCompat.getDrawable(this@RoomDetailActivity, android.R.drawable.ic_menu_delete)
                 icon?.let {
                     val iconMargin = (itemView.height - it.intrinsicHeight) / 2
@@ -283,7 +261,6 @@ class RoomDetailActivity : AppCompatActivity() {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
             }
 
-            // Called when item is fully swiped - show confirmation dialog
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 if (isWindow) {
@@ -293,7 +270,6 @@ class RoomDetailActivity : AppCompatActivity() {
                         .setMessage("Are you sure you want to delete '${window.name}'?")
                         .setPositiveButton("Delete") { _, _ -> deleteWindow(window, position) }
                         .setNegativeButton("Cancel") { _, _ ->
-                            // Restore item if user cancels
                             ui.windowList.adapter?.notifyDataSetChanged()
                         }
                         .show()
@@ -304,7 +280,6 @@ class RoomDetailActivity : AppCompatActivity() {
                         .setMessage("Are you sure you want to delete '${fs.name}'?")
                         .setPositiveButton("Delete") { _, _ -> deleteFloorSpace(fs, position) }
                         .setNegativeButton("Cancel") { _, _ ->
-                            // Restore item if user cancels
                             ui.floorSpaceList.adapter?.notifyDataSetChanged()
                         }
                         .show()
@@ -314,7 +289,6 @@ class RoomDetailActivity : AppCompatActivity() {
         ItemTouchHelper(swipeHandler).attachToRecyclerView(recyclerView)
     }
 
-    // Delete a window from Firebase and update the list
     private fun deleteWindow(window: Window, position: Int) {
         val db = Firebase.firestore
         houseId?.let { hid ->
@@ -328,7 +302,6 @@ class RoomDetailActivity : AppCompatActivity() {
                             windows.removeAt(position)
                             ui.windowList.adapter?.notifyDataSetChanged()
                             Toast.makeText(this, "Window deleted!", Toast.LENGTH_SHORT).show()
-                            // Show empty state if no windows left
                             ui.txtNoWindows.visibility = if (windows.isEmpty()) View.VISIBLE else View.GONE
                         }
                         .addOnFailureListener {
@@ -340,7 +313,6 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Delete a floor space from Firebase and update the list
     private fun deleteFloorSpace(fs: FloorSpace, position: Int) {
         val db = Firebase.firestore
         houseId?.let { hid ->
@@ -354,7 +326,6 @@ class RoomDetailActivity : AppCompatActivity() {
                             floorSpaces.removeAt(position)
                             ui.floorSpaceList.adapter?.notifyDataSetChanged()
                             Toast.makeText(this, "Floor space deleted!", Toast.LENGTH_SHORT).show()
-                            // Show empty state if no floor spaces left
                             ui.txtNoFloorSpaces.visibility = if (floorSpaces.isEmpty()) View.VISIBLE else View.GONE
                         }
                         .addOnFailureListener {
@@ -366,7 +337,6 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Delete entire room from Firebase and go back
     private fun deleteRoom() {
         val db = Firebase.firestore
         houseId?.let { hid ->
@@ -385,7 +355,6 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Load windows from Firebase subcollection
     private fun loadWindows() {
         val db = Firebase.firestore
         houseId?.let { hid ->
@@ -398,10 +367,9 @@ class RoomDetailActivity : AppCompatActivity() {
                         windows.clear()
                         for (doc in result) {
                             val window = doc.toObject(Window::class.java)
-                            window.id = doc.id
+                            window.id = doc.id // store doc id
                             windows.add(window)
                         }
-                        // Show empty state or list
                         ui.txtNoWindows.visibility = if (windows.isEmpty()) View.VISIBLE else View.GONE
                         ui.windowList.adapter?.notifyDataSetChanged()
                     }
@@ -409,7 +377,6 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Load floor spaces from Firebase subcollection
     private fun loadFloorSpaces() {
         val db = Firebase.firestore
         houseId?.let { hid ->
@@ -422,10 +389,9 @@ class RoomDetailActivity : AppCompatActivity() {
                         floorSpaces.clear()
                         for (doc in result) {
                             val fs = doc.toObject(FloorSpace::class.java)
-                            fs.id = doc.id
+                            fs.id = doc.id // store doc id
                             floorSpaces.add(fs)
                         }
-                        // Show empty state or list
                         ui.txtNoFloorSpaces.visibility = if (floorSpaces.isEmpty()) View.VISIBLE else View.GONE
                         ui.floorSpaceList.adapter?.notifyDataSetChanged()
                     }
@@ -433,18 +399,15 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // Reload data every time we come back to this screen
     override fun onResume() {
         super.onResume()
         loadWindows()
         loadFloorSpaces()
-        loadRoomPhoto()
+        loadRoomPhoto() // reload photo on return
     }
 
-    // ViewHolder for window list items
     inner class WindowHolder(var ui: ListItemWindowBinding) : RecyclerView.ViewHolder(ui.root)
 
-    // Adapter for window list
     inner class WindowAdapter(private val list: MutableList<Window>) : RecyclerView.Adapter<WindowHolder>() {
         override fun getItemCount() = list.size
 
@@ -458,7 +421,7 @@ class RoomDetailActivity : AppCompatActivity() {
             holder.ui.txtWindowName.text = window.name ?: "No name"
             holder.ui.txtWindowSize.text = "${window.width} x ${window.height} mm"
 
-            // Tap window card to open edit screen with pre-filled data
+            // tap to edit
             holder.itemView.setOnClickListener {
                 val intent = Intent(this@RoomDetailActivity, AddWindowActivity::class.java)
                 intent.putExtra("HOUSE_ID", houseId)
@@ -477,10 +440,8 @@ class RoomDetailActivity : AppCompatActivity() {
         }
     }
 
-    // ViewHolder for floor space list items
     inner class FloorSpaceHolder(var ui: ListItemFloorSpaceBinding) : RecyclerView.ViewHolder(ui.root)
 
-    // Adapter for floor space list
     inner class FloorSpaceAdapter(private val list: MutableList<FloorSpace>) : RecyclerView.Adapter<FloorSpaceHolder>() {
         override fun getItemCount() = list.size
 
@@ -494,7 +455,7 @@ class RoomDetailActivity : AppCompatActivity() {
             holder.ui.txtFloorSpaceName.text = fs.name ?: "No name"
             holder.ui.txtFloorSpaceSize.text = "${fs.width} x ${fs.depth} m"
 
-            // Tap floor space card to open edit screen with pre-filled data
+            // tap to edit
             holder.itemView.setOnClickListener {
                 val intent = Intent(this@RoomDetailActivity, AddFloorSpaceActivity::class.java)
                 intent.putExtra("HOUSE_ID", houseId)

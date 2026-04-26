@@ -20,7 +20,7 @@ class AddHouseActivity : AppCompatActivity() {
         ui = ActivityAddHouseBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        houseId = intent.getStringExtra("HOUSE_ID")
+        houseId = intent.getStringExtra("HOUSE_ID") // null if new project
         isEditMode = houseId != null
 
         ui.toolbar.title = if (isEditMode) "Edit Project" else "New Project"
