@@ -60,18 +60,28 @@ class MainActivity : AppCompatActivity() {
     private fun loadHouses() {
         val db = Firebase.firestore
         db.collection("houses")
-            .get()
-            .addOnSuccessListener { result ->
+            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .addSnapshotListener { result, error ->
+                if (error != null) {
+                    Log.e(FIREBASE_TAG, "Error loading houses", error)
+                    return@addSnapshotListener
+                }
                 allItems.clear()
                 displayItems.clear()
-                for (document in result) {
+                for (document in result!!) {
                     val house = document.toObject(House::class.java)
                     house.id = document.id
                     allItems.add(house)
                 }
-                allItems.reverse()
-                ui.searchBar.text.clear()
-                displayItems.addAll(allItems)
+                val query = ui.searchBar.text.toString().lowercase().trim()
+                if (query.isEmpty()) {
+                    displayItems.addAll(allItems)
+                } else {
+                    displayItems.addAll(allItems.filter {
+                        it.customerName?.lowercase()?.contains(query) == true ||
+                                it.address?.lowercase()?.contains(query) == true
+                    })
+                }
                 if (displayItems.isEmpty()) {
                     ui.txtEmpty.visibility = android.view.View.VISIBLE
                 } else {
@@ -79,11 +89,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 (ui.houseList.adapter as HouseAdapter).notifyDataSetChanged()
             }
-            .addOnFailureListener {
-                Log.e(FIREBASE_TAG, "Error loading houses", it)
-            }
     }
-
     inner class HouseHolder(var ui: ListItemHouseBinding) :
         RecyclerView.ViewHolder(ui.root) {}
 
@@ -115,5 +121,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         loadHouses()
+
     }
 }

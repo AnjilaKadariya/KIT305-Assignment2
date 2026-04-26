@@ -20,16 +20,12 @@ class AddHouseActivity : AppCompatActivity() {
         ui = ActivityAddHouseBinding.inflate(layoutInflater)
         setContentView(ui.root)
 
-        // Check if we are editing an existing house
         houseId = intent.getStringExtra("HOUSE_ID")
         isEditMode = houseId != null
 
-        // Set toolbar title based on mode
         ui.toolbar.title = if (isEditMode) "Edit Project" else "New Project"
         ui.toolbar.setNavigationOnClickListener { finish() }
 
-
-        // Show delete button only in edit mode
         if (isEditMode) {
             ui.btnDeleteHouse.visibility = android.view.View.VISIBLE
             ui.toolbar.title = "Edit Project"
@@ -38,29 +34,26 @@ class AddHouseActivity : AppCompatActivity() {
             ui.btnDeleteHouse.visibility = android.view.View.GONE
         }
 
-// Delete button with confirmation
+        // Delete button with confirmation
         ui.btnDeleteHouse.setOnClickListener {
             android.app.AlertDialog.Builder(this)
                 .setTitle("Delete Project")
                 .setMessage("Are you sure you want to delete this project? All rooms, windows and floor spaces will be lost!")
                 .setPositiveButton("Delete") { _, _ ->
-                    val db = com.google.firebase.Firebase.firestore
+                    val db = Firebase.firestore
                     houseId?.let { id ->
                         db.collection("houses").document(id).delete()
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "Project deleted!", Toast.LENGTH_SHORT).show()
-                                val intent = Intent(this, MainActivity::class.java)
-                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                                startActivity(intent)
-                                finish()
-                            }
                     }
+                    Toast.makeText(this, "Project deleted! 🗑️", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
         }
 
-        // Set up property type dropdown
+        // Property type dropdown
         val propertyTypes = arrayOf(
             "Select Property Type",
             "House",
@@ -72,12 +65,10 @@ class AddHouseActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(R.layout.spinner_item)
         ui.spinnerPropertyType.adapter = adapter
 
-        // If edit mode, load existing data and pre-fill fields
         if (isEditMode) {
             loadHouseData()
         }
 
-        // Save button - calls update or save depending on mode
         ui.btnSave.setOnClickListener {
             if (isEditMode) {
                 updateHouse()
@@ -87,7 +78,6 @@ class AddHouseActivity : AppCompatActivity() {
         }
     }
 
-    // Load existing house data and pre-fill all fields
     private fun loadHouseData() {
         val db = Firebase.firestore
         houseId?.let { id ->
@@ -97,7 +87,6 @@ class AddHouseActivity : AppCompatActivity() {
                     ui.txtPhone.setText(doc.getString("phone") ?: "")
                     ui.txtEmail.setText(doc.getString("email") ?: "")
 
-                    // Split address back into parts
                     val fullAddress = doc.getString("address") ?: ""
                     val parts = fullAddress.split(", ")
                     if (parts.size >= 2) {
@@ -111,7 +100,6 @@ class AddHouseActivity : AppCompatActivity() {
 
                     ui.txtEmergencyContact.setText(doc.getString("emergencyContact") ?: "")
 
-                    // Set spinner to correct property type
                     val propertyType = doc.getString("propertyType") ?: ""
                     val propertyTypes = arrayOf("Select Property Type", "House", "Apartment", "Unit", "Townhouse")
                     val index = propertyTypes.indexOf(propertyType)
@@ -120,7 +108,6 @@ class AddHouseActivity : AppCompatActivity() {
         }
     }
 
-    // Validate all fields and return true if valid
     private fun validateFields(): Boolean {
         val customerName = ui.txtCustomerName.text.toString().trim()
         val phone = ui.txtPhone.text.toString().trim().replace(" ", "").replace("-", "")
@@ -130,37 +117,37 @@ class AddHouseActivity : AppCompatActivity() {
         val postcode = ui.txtPostcode.text.toString().trim()
 
         if (customerName.isEmpty()) {
-            ui.txtCustomerName.error = "Customer name is required"
+            ui.txtCustomerName.error = "Required"
             ui.txtCustomerName.requestFocus()
             return false
         }
         if (phone.isEmpty()) {
-            ui.txtPhone.error = "Phone number is required"
+            ui.txtPhone.error = "Required"
             ui.txtPhone.requestFocus()
             return false
         }
-        if (phone.length != 10) {
-            ui.txtPhone.error = "Phone number must be exactly 10 digits"
+        if (phone.length < 8 || phone.length > 12) {
+            ui.txtPhone.error = "Invalid phone number"
             ui.txtPhone.requestFocus()
             return false
         }
         if (email.isNotEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            ui.txtEmail.error = "Please enter a valid email address"
+            ui.txtEmail.error = "Invalid email"
             ui.txtEmail.requestFocus()
             return false
         }
         if (address.isEmpty()) {
-            ui.txtAddress.error = "Address is required"
+            ui.txtAddress.error = "Required"
             ui.txtAddress.requestFocus()
             return false
         }
         if (suburb.isEmpty()) {
-            ui.txtSuburb.error = "Suburb is required"
+            ui.txtSuburb.error = "Required"
             ui.txtSuburb.requestFocus()
             return false
         }
         if (postcode.isEmpty()) {
-            ui.txtPostcode.error = "Postcode is required"
+            ui.txtPostcode.error = "Required"
             ui.txtPostcode.requestFocus()
             return false
         }
@@ -171,7 +158,6 @@ class AddHouseActivity : AppCompatActivity() {
         return true
     }
 
-    // Save new house to Firebase
     private fun saveHouse() {
         if (!validateFields()) return
 
@@ -189,34 +175,31 @@ class AddHouseActivity : AppCompatActivity() {
         db.collection("houses").add(house)
         Toast.makeText(this, "Project saved! 🎉", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-        finish()
     }
 
-    // Update existing house in Firebase
     private fun updateHouse() {
         if (!validateFields()) return
+        if (houseId == null) return
 
         val phone = ui.txtPhone.text.toString().trim().replace(" ", "").replace("-", "")
         val fullAddress = "${ui.txtAddress.text.toString().trim()}, ${ui.txtSuburb.text.toString().trim()} ${ui.txtPostcode.text.toString().trim()}"
 
         val db = Firebase.firestore
-        houseId?.let { id ->
-            db.collection("houses").document(id)
-                .update(
-                    "customerName", ui.txtCustomerName.text.toString().trim(),
-                    "address", fullAddress,
-                    "phone", phone,
-                    "propertyType", ui.spinnerPropertyType.selectedItem.toString()
-                )
-                .addOnSuccessListener {
-                    Toast.makeText(this, "Project updated! ✅", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Error updating project", Toast.LENGTH_SHORT).show()
-                }
-        }
+        db.collection("houses").document(houseId!!)
+            .update(
+                "customerName", ui.txtCustomerName.text.toString().trim(),
+                "address", fullAddress,
+                "phone", phone,
+                "email", ui.txtEmail.text.toString().trim(),
+                "propertyType", ui.spinnerPropertyType.selectedItem.toString(),
+                "emergencyContact", ui.txtEmergencyContact.text.toString().trim()
+            )
+
+        Toast.makeText(this, "Project updated! ✅", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
 }

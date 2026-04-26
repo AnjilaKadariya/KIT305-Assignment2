@@ -15,15 +15,17 @@
         android:paddingBottom="16dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Floor Me 🏠"
+            android:text="Floor Me"
             android:textColor="#1A1A1A"
             android:textSize="26sp"
             android:textStyle="bold"
+            android:gravity="center"
             android:fontFamily="sans-serif-medium"/>
 
         <TextView
@@ -32,6 +34,7 @@
             android:text="We measure up so you don't have to"
             android:textColor="#888888"
             android:textSize="13sp"
+            android:gravity="center"
             android:fontFamily="sans-serif"
             android:layout_marginTop="2dp"/>
 
@@ -44,7 +47,8 @@
         android:background="#FFFFFF"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingBottom="12dp">
+        android:paddingBottom="12dp"
+        android:paddingTop="8dp">
 
         <EditText
             android:id="@+id/searchBar"
@@ -84,7 +88,10 @@
         android:background="#F0F2F0"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
-        android:paddingTop="8dp"/>
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"/>
 
     <!-- Add new house button -->
     <Button

@@ -13,7 +13,7 @@
         android:background="#FFFFFF"
         app:title="New Project"
         app:titleTextColor="#1A1A1A"
-        app:navigationIcon="@drawable/ic_back_white"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:navigationIconTint="#1A1A1A">
 
         <ImageButton
@@ -25,7 +25,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="6dp"
             android:layout_marginEnd="12dp"
-            app:tint="#CC0000"
+            app:tint="#1A1A1A"
             android:visibility="gone"/>
 
     </androidx.appcompat.widget.Toolbar>
@@ -252,19 +252,20 @@
                 android:inputType="phone"
                 android:layout_marginBottom="24dp"/>
 
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:text="Save Project"
-                android:backgroundTint="#1B8A5A"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="16sp"/>
-
         </LinearLayout>
 
     </ScrollView>
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:text="Save Project"
+        android:backgroundTint="#1B8A5A"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="16sp"
+        android:layout_margin="16dp"/>
 
 </LinearLayout>

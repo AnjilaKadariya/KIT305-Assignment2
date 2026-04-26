@@ -26,8 +26,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_myplaces"
-                app:tint="#1B8A5A"
+                android:src="@drawable/ic_person"
                 android:layout_marginRight="12dp"/>
 
             <TextView
@@ -58,8 +57,7 @@
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:src="@android:drawable/ic_menu_call"
-                app:tint="#888888"
+                android:src="@drawable/ic_phone"
                 android:layout_marginRight="12dp"/>
 
             <TextView
@@ -81,8 +79,7 @@
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:src="@android:drawable/ic_menu_mapmode"
-                app:tint="#888888"
+                android:src="@drawable/ic_location"
                 android:layout_marginRight="12dp"/>
 
             <TextView

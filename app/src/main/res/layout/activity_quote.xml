@@ -13,7 +13,7 @@
         android:background="#FFFFFF"
         app:title="Quote Summary"
         app:titleTextColor="#1A1A1A"
-        app:navigationIcon="@drawable/ic_back_white"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:navigationIconTint="#1A1A1A"/>
 
     <View
