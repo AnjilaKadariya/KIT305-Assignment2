@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import au.edu.utas.kit305.assignment2.databinding.ActivitySelectProductBinding
 import au.edu.utas.kit305.assignment2.databinding.ListItemProductBinding
-import java.net.HttpURLConnection
-import java.net.URL
 
 data class Product(
     val id: String,
@@ -34,19 +32,17 @@ data class Product(
 class SelectProductActivity : AppCompatActivity() {
 
     private lateinit var ui: ActivitySelectProductBinding
-    private var forType: String = "window"
+    private var category: String = "window"
     private var windowWidth: Float = 0f
     private var windowHeight: Float = 0f
     private var floorWidth: Float = 0f
     private var floorDepth: Float = 0f
 
-    private val windowCategories = setOf("Blind", "Curtain", "Shutter")
-    private val floorCategories = setOf("Carpet", "Timber", "Vinyl", "Rubber", "Concrete", "Cork", "Loop")
-
     private val allProducts = mutableListOf<Product>()
     private val filteredProducts = mutableListOf<Product>()
     private var selectedProduct: Product? = null
     private var selectedColour: String = ""
+    private var spinnerReady = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,13 +51,14 @@ class SelectProductActivity : AppCompatActivity() {
 
         ui.toolbar.setNavigationOnClickListener { finish() }
 
-        forType = intent.getStringExtra("FOR_TYPE") ?: "window"
+        category = intent.getStringExtra("category") ?: "window"
+        Log.d("PRODUCTS", "Received category: $category")
         windowWidth = intent.getFloatExtra("WINDOW_WIDTH", 0f)
         windowHeight = intent.getFloatExtra("WINDOW_HEIGHT", 0f)
         floorWidth = intent.getFloatExtra("FLOOR_WIDTH", 0f)
         floorDepth = intent.getFloatExtra("FLOOR_DEPTH", 0f)
 
-        val productTypes = if (forType == "window") {
+        val productTypes = if (category == "window") {
             arrayOf("All Types", "Blind", "Curtain", "Shutter")
         } else {
             arrayOf("All Types", "Carpet", "Timber", "Vinyl", "Rubber", "Concrete", "Cork", "Loop")
@@ -78,6 +75,7 @@ class SelectProductActivity : AppCompatActivity() {
 
         ui.spinnerProductType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if (!spinnerReady) { spinnerReady = true; return }
                 updateColourSpinnerForType()
                 filterProducts()
             }
@@ -86,6 +84,7 @@ class SelectProductActivity : AppCompatActivity() {
 
         ui.spinnerColour.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                if (!spinnerReady) return
                 selectedColour = ui.spinnerColour.selectedItem.toString()
                 filterProducts()
             }
@@ -107,6 +106,7 @@ class SelectProductActivity : AppCompatActivity() {
             finish()
         }
     }
+
     private fun fetchProducts() {
         ui.progressBar.visibility = View.VISIBLE
         Thread {
@@ -155,6 +155,10 @@ class SelectProductActivity : AppCompatActivity() {
                     ))
                 }
 
+                if (products.isNotEmpty()) {
+                    Log.d("PRODUCTS", "First product category: ${products[0].type}")
+                }
+
                 runOnUiThread {
                     ui.progressBar.visibility = View.GONE
                     allProducts.clear()
@@ -175,11 +179,10 @@ class SelectProductActivity : AppCompatActivity() {
     }
 
     private fun updateColourSpinner() {
-        val validCategories = if (forType == "window") windowCategories else floorCategories
         val colours = mutableSetOf<String>()
         colours.add("All Colours")
         allProducts
-            .filter { it.type in validCategories }
+            .filter { it.type.equals(category, ignoreCase = true) }
             .forEach { colours.addAll(it.colours) }
 
         val colourAdapter = ArrayAdapter(this, R.layout.spinner_item, colours.toList())
@@ -188,13 +191,10 @@ class SelectProductActivity : AppCompatActivity() {
     }
 
     private fun updateColourSpinnerForType() {
-        val validCategories = if (forType == "window") windowCategories else floorCategories
-        val selectedType = ui.spinnerProductType.selectedItem?.toString() ?: "All Types"
         val colours = mutableSetOf<String>()
         colours.add("All Colours")
         for (product in allProducts) {
-            if (product.type !in validCategories) continue
-            if (selectedType != "All Types" && !product.type.equals(selectedType, ignoreCase = true)) continue
+            if (!product.type.equals(category, ignoreCase = true)) continue
             colours.addAll(product.colours)
         }
         val colourAdapter = ArrayAdapter(this, R.layout.spinner_item, colours.toList())
@@ -203,14 +203,12 @@ class SelectProductActivity : AppCompatActivity() {
     }
 
     private fun filterProducts() {
-        val validCategories = if (forType == "window") windowCategories else floorCategories
         val selectedType = ui.spinnerProductType.selectedItem?.toString() ?: "All Types"
         val selectedColour = ui.spinnerColour.selectedItem?.toString() ?: "All Colours"
 
         filteredProducts.clear()
         for (product in allProducts) {
-            if (product.type !in validCategories) continue
-            if (selectedType != "All Types" && !product.type.equals(selectedType, ignoreCase = true)) continue
+            if (!product.type.equals(category, ignoreCase = true)) continue
             if (selectedColour != "All Colours" && !product.colours.any { it.equals(selectedColour, ignoreCase = true) }) continue
             filteredProducts.add(product)
         }
@@ -219,7 +217,7 @@ class SelectProductActivity : AppCompatActivity() {
     }
 
     private fun meetsConstraints(product: Product): Pair<Boolean, String> {
-        if (forType == "window") {
+        if (category == "window") {
             if (product.minWidth > 0 && windowWidth < product.minWidth) {
                 return Pair(false, "Requires min width ${product.minWidth.toInt()}mm, your window is ${windowWidth.toInt()}mm")
             }
@@ -254,7 +252,6 @@ class SelectProductActivity : AppCompatActivity() {
             holder.ui.txtProductName.text = product.name
             holder.ui.txtPrice.text = "$${product.pricePerM2}/m²"
             holder.ui.txtDescription.text = product.description
-            holder.ui.txtLabour.text = "Labour: $${product.labourCost}"
 
             com.bumptech.glide.Glide.with(this@SelectProductActivity)
                 .load(product.imageUrl)

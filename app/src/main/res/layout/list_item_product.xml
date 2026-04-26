@@ -61,14 +61,6 @@
                 android:layout_marginTop="2dp"/>
 
             <TextView
-                android:id="@+id/txtLabour"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#888888"
-                android:textSize="11sp"
-                android:fontFamily="sans-serif"/>
-
-            <TextView
                 android:id="@+id/txtConstraintError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

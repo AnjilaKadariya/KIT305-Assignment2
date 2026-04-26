@@ -70,7 +70,7 @@ class AddFloorSpaceActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val intent = Intent(this, SelectProductActivity::class.java)
-            intent.putExtra("FOR_TYPE", "floorspace")
+            intent.putExtra("category", "floor")
             intent.putExtra("FLOOR_WIDTH", widthStr.toFloatOrNull() ?: 0f)
             intent.putExtra("FLOOR_DEPTH", depthStr.toFloatOrNull() ?: 0f)
             startActivityForResult(intent, REQUEST_PRODUCT)

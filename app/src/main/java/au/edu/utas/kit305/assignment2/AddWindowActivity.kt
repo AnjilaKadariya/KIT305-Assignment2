@@ -70,7 +70,7 @@ class AddWindowActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val intent = Intent(this, SelectProductActivity::class.java)
-            intent.putExtra("FOR_TYPE", "window")
+            intent.putExtra("category", "window")
             intent.putExtra("WINDOW_WIDTH", widthStr.toFloatOrNull() ?: 0f)
             intent.putExtra("WINDOW_HEIGHT", heightStr.toFloatOrNull() ?: 0f)
             startActivityForResult(intent, REQUEST_PRODUCT)
